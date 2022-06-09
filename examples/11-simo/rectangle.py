@@ -24,15 +24,18 @@ parser.add_argument("-M","--plot_mesh", help="Plot each mesh",
                     action="store_true")
 parser.add_argument("-G","--plot_geometry", help="Plot geometry",
                     action="store_true")
+parser.add_argument("-B","--bending", help="Show bending related constants",
+                    action="store_true")
 args = parser.parse_args()
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
       format(args.width, args.height,args.rtol))
 rtol=args.rtol
+bending=args.bending
 geometry = sections.rectangular_section(args.width, args.height)
 if args.plot_geometry:
     geometry.plot_geometry()
 a=geometry.calculate_area()
-j0=a
+it0=a
 iw0=a
 ms=min(args.width,args.height)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
@@ -48,20 +51,24 @@ while True:
     if args.plot_mesh:
         section.plot_mesh()
     section.calculate_geometric_properties()
+    if bending:
+        print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
+              .format(section.get_area(),*section.get_ic()))
+        bending=False
     section.calculate_warping_properties()
-    j = section.get_j()
-    if math.isnan(j):
+    it = section.get_j()
+    if math.isnan(it):
         continue
     iw = section.get_gamma()
-    jDiff=abs((j-j0)/j0)
+    itDiff=abs((it-it0)/it0)
     iwDiff=abs((iw-iw0)/iw0)
-    print(("J = {0:.3g}, Iw = {1:.3g}, "+
+    print(("It = {0:.3g}, Iw = {1:.3g}, "+
           "meshSize = {2:.3g}, {5} nodes, {6} elements, "+
-          "jDiff = {3:.3g}, iwDiff = {4:.3g}")
-          .format(j,iw,ms,jDiff,iwDiff,
+          "itDiff = {3:.3g}, iwDiff = {4:.3g}")
+          .format(it,iw,ms,itDiff,iwDiff,
                   section.num_nodes,len(section.elements)))
-    if(jDiff<rtol and iwDiff<rtol ):
+    if(itDiff<rtol and iwDiff<rtol ):
         break
     else:
-        j0=j
+        it0=it
         iw0=iw
