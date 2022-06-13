@@ -26,11 +26,15 @@ parser.add_argument("-G","--plot_geometry", help="Plot geometry",
                     action="store_true")
 parser.add_argument("-B","--bending", help="Show bending related constants",
                     action="store_true")
+parser.add_argument("-F","--frame_analysis",
+                    help="Show frame analysis results",
+                    action="store_true")
 args = parser.parse_args()
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
       format(args.width, args.height,args.rtol))
 rtol=args.rtol
 bending=args.bending
+frame_analysis=args.frame_analysis
 geometry = sections.rectangular_section(args.width, args.height)
 if args.plot_geometry:
     geometry.plot_geometry()
@@ -55,20 +59,28 @@ while True:
         print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
               .format(section.get_area(),*section.get_ic()))
         bending=False
-    section.calculate_warping_properties()
-    it = section.get_j()
-    if math.isnan(it):
-        continue
-    iw = section.get_gamma()
+    if frame_analysis:
+        (area, ixx, iyy, ixy, it, phi)=section.calculate_frame_properties()
+        print(("f: A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, "+
+               "Ixy = {3:.3g}, J = {4:.3g}")
+              .format(area,ixx,iyy,ixy,it))
+        iwDiff=0
+        iw=0
+    else:
+        section.calculate_warping_properties()
+        it = section.get_j()
+        if math.isnan(it):
+            continue
+        iw = section.get_gamma()
+        iwDiff=abs((iw-iw0)/iw0)
+        print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
     itDiff=abs((it-it0)/it0)
-    iwDiff=abs((iw-iw0)/iw0)
-    print(("It = {0:.3g}, Iw = {1:.3g}, "+
-          "meshSize = {2:.3g}, {5} nodes, {6} elements, "+
-          "itDiff = {3:.3g}, iwDiff = {4:.3g}")
-          .format(it,iw,ms,itDiff,iwDiff,
-                  section.num_nodes,len(section.elements)))
     if(itDiff<rtol and iwDiff<rtol ):
         break
     else:
         it0=it
         iw0=iw
+        print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
+                      "itDiff = {1:.3g}, iwDiff = {2:.3g}")
+              .format(ms,itDiff,iwDiff,
+                  section.num_nodes,len(section.elements)))
