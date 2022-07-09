@@ -15,8 +15,7 @@ from shapely.geometry import Polygon
 import sectionproperties.pre.geometry as geometry
 import sectionproperties.pre.pre as pre
 from sectionproperties.pre.library.utils import draw_radius
-
-
+import matplotlib.pyplot as plt
 def u_section(
     d: float,
     b: float,
@@ -63,7 +62,6 @@ def u_section(
     polygon = Polygon(points)
     return geometry.Geometry(polygon, material)
 
-
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-W","--width", help="width",
@@ -101,6 +99,32 @@ bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = u_section(args.height, args.width,
                               args.thickness, args.radius, args.n_r)
+# plot figure
+fig, axes = plt.subplots()
+axes.set_aspect("equal", anchor="C")
+axes.set_title('U-{0:g}x{1:g}x{2:g}'.
+               format(args.height,args.width,args.thickness))
+# plot outline
+for (f) in geometry.facets:
+    axes.plot(
+        [geometry.points[f[0]][0], geometry.points[f[1]][0]],
+        [geometry.points[f[0]][1], geometry.points[f[1]][1]],
+        'k-',
+        )
+axes.set_xticks([0,args.width])
+axes.set_yticks([0,args.height])
+t=args.thickness
+r_in=args.radius-t
+n_r=args.n_r
+ai=n_r//2-1
+ap=draw_radius([t + r_in, t + r_in], r_in, 1.5 * np.pi, n_r, False)
+axes.annotate('r={0:.5g}'.format(args.thickness),
+              xycoords='data',
+              xy=(ap[ai][0],ap[ai][1]),
+              xytext=(0.25*args.width,0.25*args.height),
+              arrowprops=dict(arrowstyle='->')
+              )
+plt.show()
 if args.plot_geometry:
     geometry.plot_geometry()
 a=geometry.calculate_area()
