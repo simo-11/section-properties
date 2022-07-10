@@ -81,10 +81,15 @@ parser.add_argument("-M","--plot_mesh", help="Plot each mesh",
                     action="store_true")
 parser.add_argument("-G","--plot_geometry", help="Plot geometry",
                     action="store_true")
+parser.add_argument("-P","--plot_section", help="Plot section",
+                    action="store_true")
 parser.add_argument("-B","--bending", help="Show bending related constants",
                     action="store_true")
 parser.add_argument("-F","--frame_analysis",
                     help="Show frame analysis results",
+                    action="store_true")
+parser.add_argument("-A","--run_analysis",
+                    help="run analysis",
                     action="store_true")
 args = parser.parse_args()
 if args.radius<args.thickness:
@@ -99,32 +104,38 @@ bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = u_section(args.height, args.width,
                               args.thickness, args.radius, args.n_r)
-# plot figure
-fig, axes = plt.subplots()
-axes.set_aspect("equal", anchor="C")
-axes.set_title('U-{0:g}x{1:g}x{2:g}'.
-               format(args.height,args.width,args.thickness))
-# plot outline
-for (f) in geometry.facets:
-    axes.plot(
-        [geometry.points[f[0]][0], geometry.points[f[1]][0]],
-        [geometry.points[f[0]][1], geometry.points[f[1]][1]],
-        'k-',
-        )
-axes.set_xticks([0,args.width])
-axes.set_yticks([0,args.height])
-t=args.thickness
-r_in=args.radius-t
-n_r=args.n_r
-ai=n_r//2-1
-ap=draw_radius([t + r_in, t + r_in], r_in, 1.5 * np.pi, n_r, False)
-axes.annotate('r={0:.5g}'.format(args.thickness),
-              xycoords='data',
-              xy=(ap[ai][0],ap[ai][1]),
-              xytext=(0.25*args.width,0.25*args.height),
-              arrowprops=dict(arrowstyle='->')
-              )
-plt.show()
+if args.plot_section:
+    fig, axes = plt.subplots()
+    fig.set_size_inches(4,4)
+    axes.set_aspect("equal", anchor="C")
+    axes.set_title('U-{0:g}x{1:g}x{2:g}'.
+                   format(args.height,args.width,args.thickness))
+    # plot outline
+    for (f) in geometry.facets:
+        axes.plot(
+            [geometry.points[f[0]][0], geometry.points[f[1]][0]],
+            [geometry.points[f[0]][1], geometry.points[f[1]][1]],
+            'k-',
+            )
+    axes.set_xticks([0,args.width])
+    axes.set_yticks([0,args.height])
+    t=args.thickness
+    r_in=args.radius-t
+    n_r=args.n_r
+    ai=n_r//2-1
+    ap=draw_radius([t + r_in, t + r_in], r_in, 1.5 * np.pi, n_r, False)
+    axes.annotate('r={0:.5g}'.format(args.thickness),
+                  xycoords='data',
+                  xy=(ap[ai][0],ap[ai][1]),
+                  xytext=(0.25*args.width,0.25*args.height),
+                  arrowprops=dict(arrowstyle='->')
+                  )
+    fn='USection-{0:g}x{1:g}x{2:g}.pdf'.format(*tuple([f * 1000 for f in
+                       (args.height,args.width,args.thickness)]));
+    plt.tight_layout()
+    plt.savefig(fn);
+    print("Saved {0}".format(fn))
+    plt.show()
 if args.plot_geometry:
     geometry.plot_geometry()
 a=geometry.calculate_area()
@@ -132,46 +143,47 @@ it0=a
 iw0=a
 ms=min(args.width,args.height)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
-while True:
-    ms=0.5*ms
-    geometry.create_mesh(mesh_sizes=[ms])
-    vertices=geometry.mesh.get('vertices').size
-    if vertices0==vertices:
+if args.run_analysis:
+    while True:
         ms=0.5*ms
-        continue
-    vertices0=vertices
-    section = Section(geometry)
-    if args.plot_mesh:
-        section.plot_mesh()
-    section.calculate_geometric_properties()
-    if bending:
-        print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
-              .format(section.get_area(),*section.get_ic()))
-        bending=False
-    if frame_analysis:
-        (area, ixx, iyy, ixy, it, phi)=section.calculate_frame_properties()
-        print(("f: A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, "+
-               "Ixy = {3:.3g}, J = {4:.3g}")
-              .format(area,ixx,iyy,ixy,it))
-        iwDiff=0
-        iw=0
-    else:
-        section.calculate_warping_properties()
-        it = section.get_j()
-        if math.isnan(it):
+        geometry.create_mesh(mesh_sizes=[ms])
+        vertices=geometry.mesh.get('vertices').size
+        if vertices0==vertices:
+            ms=0.5*ms
             continue
-        iw = section.get_gamma()
-        iwDiff=abs((iw-iw0)/iw0)
-        print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
-    itDiff=abs((it-it0)/it0)
-    if(itDiff<rtol and iwDiff<rtol ):
-        break
-    else:
-        it0=it
-        iw0=iw
-        print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
-                      "itDiff = {1:.3g}, iwDiff = {2:.3g}")
-              .format(ms,itDiff,iwDiff,
-                  section.num_nodes,len(section.elements)))
-section.plot_centroids()
-print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
+        vertices0=vertices
+        section = Section(geometry)
+        if args.plot_mesh:
+            section.plot_mesh()
+        section.calculate_geometric_properties()
+        if bending:
+            print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
+                  .format(section.get_area(),*section.get_ic()))
+            bending=False
+        if frame_analysis:
+            (area, ixx, iyy, ixy, it, phi)=section.calculate_frame_properties()
+            print(("f: A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, "+
+                   "Ixy = {3:.3g}, J = {4:.3g}")
+                  .format(area,ixx,iyy,ixy,it))
+            iwDiff=0
+            iw=0
+        else:
+            section.calculate_warping_properties()
+            it = section.get_j()
+            if math.isnan(it):
+                continue
+            iw = section.get_gamma()
+            iwDiff=abs((iw-iw0)/iw0)
+            print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
+        itDiff=abs((it-it0)/it0)
+        if(itDiff<rtol and iwDiff<rtol ):
+            break
+        else:
+            it0=it
+            iw0=iw
+            print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
+                          "itDiff = {1:.3g}, iwDiff = {2:.3g}")
+                  .format(ms,itDiff,iwDiff,
+                      section.num_nodes,len(section.elements)))
+    section.plot_centroids()
+    print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
