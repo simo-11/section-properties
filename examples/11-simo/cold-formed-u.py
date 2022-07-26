@@ -92,8 +92,11 @@ parser.add_argument("-A","--run_analysis",
                     help="run analysis",
                     action="store_true")
 args = parser.parse_args()
-if args.radius<args.thickness:
-    args.radius=2*args.thickness
+if args.n_r>0:
+    if args.radius<args.thickness:
+        args.radius=2*args.thickness
+else:
+    args.radius=0
 print("""Cold-formed-U: width = {0:.5g}, height = {1:.5g},
 thickness= {2:.5g}, outer radius={3:.5g}, n_r={4}
 rtol={5:g}""".
@@ -122,14 +125,15 @@ if args.plot_section:
     t=args.thickness
     r_in=args.radius-t
     n_r=args.n_r
-    ai=n_r//2-1
-    ap=draw_radius([t + r_in, t + r_in], r_in, 1.5 * np.pi, n_r, False)
-    axes.annotate('r={0:.5g}'.format(args.thickness),
-                  xycoords='data',
-                  xy=(ap[ai][0],ap[ai][1]),
-                  xytext=(0.25*args.width,0.25*args.height),
-                  arrowprops=dict(arrowstyle='->')
-                  )
+    if n_r>0:
+        ai=n_r//2-1
+        ap=draw_radius([t + r_in, t + r_in], r_in, 1.5 * np.pi, n_r, False)
+        axes.annotate('r={0:.5g}'.format(args.thickness),
+                      xycoords='data',
+                      xy=(ap[ai][0],ap[ai][1]),
+                      xytext=(0.25*args.width,0.25*args.height),
+                      arrowprops=dict(arrowstyle='->')
+                      )
     fn='USection-{0:g}x{1:g}x{2:g}.pdf'.format(*tuple([f * 1000 for f in
                        (args.height,args.width,args.thickness)]));
     plt.tight_layout()
@@ -175,6 +179,42 @@ if args.run_analysis:
             iw = section.get_gamma()
             iwDiff=abs((iw-iw0)/iw0)
             print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
+            print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
+            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+            # Axes3D currently only supports the aspect argument 'auto'.
+            #   You passed in 1
+            # ax.set_adjustable('box')
+            # ax.set_aspect(1)
+            x=section.mesh_nodes[:,0]
+            y=section.mesh_nodes[:,1]
+            z=section.section_props.omega
+            ma=section.mesh_elements
+            ne=len(ma)
+            nt=4*ne
+            ti=0
+            # triangles
+            triangles=np.empty([nt, 3],dtype=int)
+            for i in range(0,ne):
+                me=ma[i]
+                triangles[ti,0]=me[0]
+                triangles[ti,1]=me[3]
+                triangles[ti,2]=me[5]
+                ti+=1
+                triangles[ti,0]=me[3]
+                triangles[ti,1]=me[1]
+                triangles[ti,2]=me[4]
+                ti+=1
+                triangles[ti,0]=me[3]
+                triangles[ti,1]=me[4]
+                triangles[ti,2]=me[5]
+                ti+=1
+                triangles[ti,0]=me[5]
+                triangles[ti,1]=me[4]
+                triangles[ti,2]=me[2]
+                ti+=1
+            ax.plot_trisurf(x, y,triangles, z)
+            plt.show();
+            plt.show();
         itDiff=abs((it-it0)/it0)
         if(itDiff<rtol and iwDiff<rtol ):
             break
@@ -186,4 +226,3 @@ if args.run_analysis:
                   .format(ms,itDiff,iwDiff,
                       section.num_nodes,len(section.elements)))
     section.plot_centroids()
-    print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))

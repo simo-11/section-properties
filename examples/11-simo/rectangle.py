@@ -11,7 +11,8 @@ import math
 import argparse
 import sectionproperties.pre.library.primitive_sections as sections
 from sectionproperties.analysis.section import Section
-
+import matplotlib.pyplot as plt
+import numpy as np
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-W","--width", help="width of square",
@@ -28,6 +29,12 @@ parser.add_argument("-B","--bending", help="Show bending related constants",
                     action="store_true")
 parser.add_argument("-F","--frame_analysis",
                     help="Show frame analysis results",
+                    action="store_true")
+parser.add_argument("-T","--time_info",
+                    help="Show detailed info for computation",
+                    action="store_true")
+parser.add_argument("--print_warping_values",
+                    help="Print warping values",
                     action="store_true")
 args = parser.parse_args()
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
@@ -51,7 +58,7 @@ while True:
         ms=0.5*ms
         continue
     vertices0=vertices
-    section = Section(geometry)
+    section = Section(geometry, time_info=args.time_info)
     if args.plot_mesh:
         section.plot_mesh()
     section.calculate_geometric_properties()
@@ -74,6 +81,42 @@ while True:
         iw = section.get_gamma()
         iwDiff=abs((iw-iw0)/iw0)
         print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
+        if args.print_warping_values:
+            print("Warping values: x, y, warping")
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        # Axes3D currently only supports the aspect argument 'auto'.
+        #   You passed in 1
+        # ax.set_adjustable('box')
+        # ax.set_aspect(1)
+        x=section.mesh_nodes[:,0]
+        y=section.mesh_nodes[:,1]
+        z=section.section_props.omega
+        ma=section.mesh_elements
+        ne=len(ma)
+        nt=4*ne
+        ti=0
+        # triangles
+        triangles=np.empty([nt, 3],dtype=int)
+        for i in range(0,ne):
+            me=ma[i]
+            triangles[ti,0]=me[0]
+            triangles[ti,1]=me[3]
+            triangles[ti,2]=me[5]
+            ti+=1
+            triangles[ti,0]=me[3]
+            triangles[ti,1]=me[1]
+            triangles[ti,2]=me[4]
+            ti+=1
+            triangles[ti,0]=me[3]
+            triangles[ti,1]=me[4]
+            triangles[ti,2]=me[5]
+            ti+=1
+            triangles[ti,0]=me[5]
+            triangles[ti,1]=me[4]
+            triangles[ti,2]=me[2]
+            ti+=1
+        ax.plot_trisurf(x, y,triangles, z)
+        plt.show();
     itDiff=abs((it-it0)/it0)
     if(itDiff<rtol and iwDiff<rtol ):
         break
