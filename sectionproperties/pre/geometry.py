@@ -144,10 +144,10 @@ class Geometry:
             being holes or voids. The point can be located anywhere within the hole region.
             Only one point is required per hole region.
         :vartype holes: list[list[float, float]]
-        :cvar materials: Optional. A list of :class:`~sectionproperties.pre.pre.Material` objects that are to be
-            assigned, in order, to the regions defined by the given control_points. If not given, then
-            the :class:`~sectionproperties.pre.pre.DEFAULT_MATERIAL` will be used for each region.
-        :vartype materials: list[:class:`~sectionproperties.pre.pre.Material`]
+        :cvar material: Optional. A :class:`~sectionproperties.pre.pre.Material` object
+            that is to be assigned. If not given, then the
+            :class:`~sectionproperties.pre.pre.DEFAULT_MATERIAL` will be used.
+        :vartype materials: :class:`~sectionproperties.pre.pre.Material`
         """
         if len(control_points) != 1:
             raise ValueError(
@@ -225,7 +225,7 @@ class Geometry:
         :param filepath:
             File path to the rhino `.3dm` file.
         :type filepath: Union[str, pathlib.Path]
-        :param \**kwargs:
+        :param kwargs:
             See below.
         :raises RuntimeError:
             A RuntimeError is raised if two or more polygons are found.
@@ -290,7 +290,7 @@ class Geometry:
         :param r3dm_brep:
             A Rhino3dm.Brep encoded as a string.
         :type r3dm_brep: str
-        :param \**kwargs:
+        :param kwargs:
             See below.
         :return:
             A Geometry object found in the encoded string.
@@ -862,7 +862,12 @@ class Geometry:
         return new_geom
 
     def plot_geometry(
-        self, labels=["control_points"], title="Cross-Section Geometry", **kwargs
+        self,
+        labels=["control_points"],
+        title="Cross-Section Geometry",
+        cp=True,
+        legend=True,
+        **kwargs,
     ):
         """Plots the geometry defined by the input section.
 
@@ -871,7 +876,9 @@ class Geometry:
             to indicate no labels. Default is ["control_points"]
         :type labels: list[str]
         :param string title: Plot title
-        :param \**kwargs: Passed to :func:`~sectionproperties.post.post.plotting_context`
+        :param bool cp: If set to True, plots the control points
+        :param bool legend: If set to True, plots the legend
+        :param kwargs: Passed to :func:`~sectionproperties.post.post.plotting_context`
 
         :return: Matplotlib axes object
         :rtype: :class:`matplotlib.axes`
@@ -918,14 +925,15 @@ class Geometry:
 
                 ax.plot(h[0], h[1], "rx", markersize=5, markeredgewidth=1, label=label)
 
-            # plot the control points
-            for (i, cp) in enumerate(self.control_points):
-                if i == 0:
-                    label = "Control Points"
-                else:
-                    label = None
+            if cp:
+                # plot the control points
+                for (i, cp) in enumerate(self.control_points):
+                    if i == 0:
+                        label = "Control Points"
+                    else:
+                        label = None
 
-                ax.plot(cp[0], cp[1], "bo", markersize=5, label=label)
+                    ax.plot(cp[0], cp[1], "bo", markersize=5, label=label)
 
             # display the labels
             for label in labels:
@@ -954,7 +962,8 @@ class Geometry:
                         ax.annotate(str(i), xy=pt, color="r")
 
             # display the legend
-            ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+            if legend:
+                ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
 
         return ax
 
@@ -1242,6 +1251,13 @@ class CompoundGeometry(Geometry):
             )
         if holes is None:
             holes = list()
+        if materials is not pre.DEFAULT_MATERIAL:
+            if len(materials) != len(control_points):
+                raise ValueError(
+                    f"If materials are provided, the number of materials in the list must "
+                    "match the number of control_points provided.\n"
+                    f"len(materials)=={len(materials)}, len(control_points)=={len(control_points)}."
+                )
 
         # First, generate all invidual polygons from points and facets
         current_polygon_points = []
@@ -1297,17 +1313,34 @@ class CompoundGeometry(Geometry):
                 f"does not match the number of control_points given ({len(control_points)})."
             )
         if not interiors:
-            return CompoundGeometry(
-                [
-                    Geometry(exterior, control_points=control_points[idx])
-                    for idx, exterior in enumerate(exteriors)
-                ]
-            )
+            if materials is pre.DEFAULT_MATERIAL:
+                return CompoundGeometry(
+                    [
+                        Geometry(
+                            exterior,
+                            control_points=control_points[idx],
+                            material=materials,
+                        )
+                        for idx, exterior in enumerate(exteriors)
+                    ]
+                )
+            else:
+                return CompoundGeometry(
+                    [
+                        Geometry(
+                            exterior,
+                            control_points=control_points[idx],
+                            material=materials[idx],
+                        )
+                        for idx, exterior in enumerate(exteriors)
+                    ]
+                )
+
         else:
             # "Punch" all holes through each exterior geometry
             punched_exteriors = []
             punched_exterior_geometries = []
-            for exterior in exteriors:
+            for idx, exterior in enumerate(exteriors):
                 punched_exterior = exterior
                 for interior in interiors:
                     punched_exterior = punched_exterior - interior
@@ -1322,12 +1355,25 @@ class CompoundGeometry(Geometry):
                             f"Control points given are not contained within the geometry"
                             f" once holes are subtracted: {control_points}"
                         )
-                exterior_geometry = Geometry(
-                    punched_exterior, control_points=exterior_control_point
-                )
-                punched_exterior_geometries.append(exterior_geometry)
+                if materials is pre.DEFAULT_MATERIAL:
 
-        return CompoundGeometry(punched_exterior_geometries)
+                    exterior_geometry = Geometry(
+                        punched_exterior,
+                        control_points=exterior_control_point,
+                        material=materials,
+                    )
+                    punched_exterior_geometries.append(exterior_geometry)
+
+                else:
+
+                    exterior_geometry = Geometry(
+                        punched_exterior,
+                        control_points=exterior_control_point,
+                        material=materials[idx],
+                    )
+                    punched_exterior_geometries.append(exterior_geometry)
+
+            return CompoundGeometry(punched_exterior_geometries)
 
     @classmethod
     def from_3dm(cls, filepath: Union[str, pathlib.Path], **kwargs) -> CompoundGeometry:
@@ -1336,7 +1382,7 @@ class CompoundGeometry(Geometry):
         :param filepath:
             File path to the rhino `.3dm` file.
         :type filepath: Union[str, pathlib.Path]
-        :param \**kwargs:
+        :param kwargs:
             See below.
         :return:
             A `CompoundGeometry` object.
@@ -1946,11 +1992,33 @@ def check_geometry_overlaps(lop: List[Polygon]) -> bool:
 
 def check_geometry_disjoint(lop: List[Polygon]) -> bool:
     """
-    Returns True if all polygons in 'lop' are disjoint. Returns
+    Returns True if any polygons in 'lop' are disjoint. Returns
     False, otherwise.
     """
-    bool_acc = []
-    for idx, poly1 in enumerate(lop):
-        for poly2 in lop[idx + 1 :]:
-            bool_acc.append(poly1.intersection(poly2))
-    return not all(bool_acc)
+    # Build polygon connectivity network
+    network = {}
+    for idx_i, poly1 in enumerate(lop):
+        for idx_j, poly2 in enumerate(lop):
+            if idx_i != idx_j:
+                connectivity = network.get(idx_i, set())
+                if poly1.intersection(poly2):
+                    connectivity.add(idx_j)
+                network[idx_i] = connectivity
+
+    def walk_network(node: int, network: dict, nodes_visited: list[int]) -> list[int]:
+        """
+        Walks the network modifying 'nodes_visited' as it walks.
+        """
+        connections = network.get(node, set())
+        for connection in connections:
+            if connection in nodes_visited:
+                continue
+            else:
+                nodes_visited.append(connection)
+                walk_network(connection, network, nodes_visited)
+        return nodes_visited
+
+    # Traverse polygon connectivity network
+    nodes_visited = [0]
+    walk_network(0, network, nodes_visited)
+    return set(nodes_visited) != set(network.keys())
