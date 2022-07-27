@@ -7,6 +7,7 @@ Mesh is refined until relative change of torsion and warping constants
 is not more than rtol
 """
 import math
+import csv
 import argparse
 from sectionproperties.analysis.section import Section
 
@@ -62,7 +63,8 @@ def u_section(
     polygon = Polygon(points)
     return geometry.Geometry(polygon, material)
 
-parser = argparse.ArgumentParser(
+parser = argparse.ArgumentParser(description=
+    ('Calculate section properties for cold-formed U-section.'),
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-W","--width", help="width",
                     default=0.05,type=float)
@@ -73,7 +75,7 @@ parser.add_argument("-T","--thickness", help="thickness",
 parser.add_argument("-R","--radius", help="""outer radius,
 if < thickness, 2*thickness is used""",
                     default=0,type=float)
-parser.add_argument("--n_r", help="number of points in radius",
+parser.add_argument("--n_r", help="number of points in radius, 0 or >1",
                     default=4,type=int)
 parser.add_argument("--rtol", help="relative tolerance",
                     default=1e-3,type=float)
@@ -83,18 +85,26 @@ parser.add_argument("-G","--plot_geometry", help="Plot geometry",
                     action="store_true")
 parser.add_argument("-P","--plot_section", help="Plot section",
                     action="store_true")
-parser.add_argument("-B","--bending", help="Show bending related constants",
+parser.add_argument("-B","--bending", help="show bending related constants",
                     action="store_true")
 parser.add_argument("-F","--frame_analysis",
-                    help="Show frame analysis results",
+                    help="show frame analysis results",
                     action="store_true")
 parser.add_argument("-A","--run_analysis",
                     help="run analysis",
+                    action="store_true")
+parser.add_argument("--plot_warping_values",
+                    help="plot warping values for each iteration",
+                    action="store_true")
+parser.add_argument("--write_warping_csv",
+                    help="write warping values for each iteration",
                     action="store_true")
 args = parser.parse_args()
 if args.n_r>0:
     if args.radius<args.thickness:
         args.radius=2*args.thickness
+    if args.n_r==1:
+       args.n_r=2
 else:
     args.radius=0
 print("""Cold-formed-U: width = {0:.5g}, height = {1:.5g},
@@ -180,41 +190,57 @@ if args.run_analysis:
             iwDiff=abs((iw-iw0)/iw0)
             print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
             print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
-            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-            # Axes3D currently only supports the aspect argument 'auto'.
-            #   You passed in 1
-            # ax.set_adjustable('box')
-            # ax.set_aspect(1)
-            x=section.mesh_nodes[:,0]
-            y=section.mesh_nodes[:,1]
-            z=section.section_props.omega
-            ma=section.mesh_elements
-            ne=len(ma)
-            nt=4*ne
-            ti=0
-            # triangles
-            triangles=np.empty([nt, 3],dtype=int)
-            for i in range(0,ne):
-                me=ma[i]
-                triangles[ti,0]=me[0]
-                triangles[ti,1]=me[3]
-                triangles[ti,2]=me[5]
-                ti+=1
-                triangles[ti,0]=me[3]
-                triangles[ti,1]=me[1]
-                triangles[ti,2]=me[4]
-                ti+=1
-                triangles[ti,0]=me[3]
-                triangles[ti,1]=me[4]
-                triangles[ti,2]=me[5]
-                ti+=1
-                triangles[ti,0]=me[5]
-                triangles[ti,1]=me[4]
-                triangles[ti,2]=me[2]
-                ti+=1
-            ax.plot_trisurf(x, y,triangles, z)
-            plt.show();
-            plt.show();
+            if args.plot_warping_values:
+                fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+                # Axes3D currently only supports the aspect argument 'auto'.
+                #   You passed in 1
+                # ax.set_adjustable('box')
+                # ax.set_aspect(1)
+                x=section.mesh_nodes[:,0]
+                y=section.mesh_nodes[:,1]
+                z=section.section_props.omega
+                ma=section.mesh_elements
+                ne=len(ma)
+                nt=4*ne
+                ti=0
+                # triangles
+                triangles=np.empty([nt, 3],dtype=int)
+                for i in range(0,ne):
+                    me=ma[i]
+                    triangles[ti,0]=me[0]
+                    triangles[ti,1]=me[3]
+                    triangles[ti,2]=me[5]
+                    ti+=1
+                    triangles[ti,0]=me[3]
+                    triangles[ti,1]=me[1]
+                    triangles[ti,2]=me[4]
+                    ti+=1
+                    triangles[ti,0]=me[3]
+                    triangles[ti,1]=me[4]
+                    triangles[ti,2]=me[5]
+                    ti+=1
+                    triangles[ti,0]=me[5]
+                    triangles[ti,1]=me[4]
+                    triangles[ti,2]=me[2]
+                    ti+=1
+                ax.plot_trisurf(x, y,triangles, z)
+                plt.show();
+            if args.write_warping_csv:
+                x=section.mesh_nodes[:,0]
+                y=section.mesh_nodes[:,1]
+                z=section.section_props.omega
+                rows=np.empty([len(x),3],dtype=float)
+                rows[:,0]=x
+                rows[:,1]=y
+                rows[:,2]=z
+                fn='USection-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
+                     *tuple([f * 1000 for f in
+                        (args.height,args.width,args.thickness,args.radius)]),
+                     args.n_r,len(x));
+                with open(fn, 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerows(rows)
+                print("Wrote {0}".format(fn))
         itDiff=abs((it-it0)/it0)
         if(itDiff<rtol and iwDiff<rtol ):
             break

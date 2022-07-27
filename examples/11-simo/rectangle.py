@@ -13,6 +13,7 @@ import sectionproperties.pre.library.primitive_sections as sections
 from sectionproperties.analysis.section import Section
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-W","--width", help="width of square",
@@ -21,20 +22,23 @@ parser.add_argument("-H","--height", help="height of square",
                     default=0.012377,type=float)
 parser.add_argument("-R","--rtol", help="relative tolerance",
                     default=1e-3,type=float)
-parser.add_argument("-M","--plot_mesh", help="Plot each mesh",
+parser.add_argument("-M","--plot_mesh", help="plot each mesh",
                     action="store_true")
-parser.add_argument("-G","--plot_geometry", help="Plot geometry",
+parser.add_argument("-G","--plot_geometry", help="plot geometry",
                     action="store_true")
-parser.add_argument("-B","--bending", help="Show bending related constants",
+parser.add_argument("-B","--bending", help="show bending related constants",
                     action="store_true")
 parser.add_argument("-F","--frame_analysis",
-                    help="Show frame analysis results",
+                    help="show frame analysis results",
                     action="store_true")
 parser.add_argument("-T","--time_info",
-                    help="Show detailed info for computation",
+                    help="show detailed info for computation",
                     action="store_true")
-parser.add_argument("--print_warping_values",
-                    help="Print warping values",
+parser.add_argument("--plot_warping_values",
+                    help="plot warping values for each iteration",
+                    action="store_true")
+parser.add_argument("--write_warping_csv",
+                    help="write warping values for each iteration",
                     action="store_true")
 args = parser.parse_args()
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
@@ -81,42 +85,55 @@ while True:
         iw = section.get_gamma()
         iwDiff=abs((iw-iw0)/iw0)
         print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
-        if args.print_warping_values:
-            print("Warping values: x, y, warping")
-        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        # Axes3D currently only supports the aspect argument 'auto'.
-        #   You passed in 1
-        # ax.set_adjustable('box')
-        # ax.set_aspect(1)
-        x=section.mesh_nodes[:,0]
-        y=section.mesh_nodes[:,1]
-        z=section.section_props.omega
-        ma=section.mesh_elements
-        ne=len(ma)
-        nt=4*ne
-        ti=0
-        # triangles
-        triangles=np.empty([nt, 3],dtype=int)
-        for i in range(0,ne):
-            me=ma[i]
-            triangles[ti,0]=me[0]
-            triangles[ti,1]=me[3]
-            triangles[ti,2]=me[5]
-            ti+=1
-            triangles[ti,0]=me[3]
-            triangles[ti,1]=me[1]
-            triangles[ti,2]=me[4]
-            ti+=1
-            triangles[ti,0]=me[3]
-            triangles[ti,1]=me[4]
-            triangles[ti,2]=me[5]
-            ti+=1
-            triangles[ti,0]=me[5]
-            triangles[ti,1]=me[4]
-            triangles[ti,2]=me[2]
-            ti+=1
-        ax.plot_trisurf(x, y,triangles, z)
-        plt.show();
+        if args.plot_warping_values:
+            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+            # Axes3D currently only supports the aspect argument 'auto'.
+            #   You passed in 1
+            # ax.set_adjustable('box')
+            # ax.set_aspect(1)
+            x=section.mesh_nodes[:,0]
+            y=section.mesh_nodes[:,1]
+            z=section.section_props.omega
+            ma=section.mesh_elements
+            ne=len(ma)
+            nt=4*ne
+            ti=0
+            # triangles
+            triangles=np.empty([nt, 3],dtype=int)
+            for i in range(0,ne):
+                me=ma[i]
+                triangles[ti,0]=me[0]
+                triangles[ti,1]=me[3]
+                triangles[ti,2]=me[5]
+                ti+=1
+                triangles[ti,0]=me[3]
+                triangles[ti,1]=me[1]
+                triangles[ti,2]=me[4]
+                ti+=1
+                triangles[ti,0]=me[3]
+                triangles[ti,1]=me[4]
+                triangles[ti,2]=me[5]
+                ti+=1
+                triangles[ti,0]=me[5]
+                triangles[ti,1]=me[4]
+                triangles[ti,2]=me[2]
+                ti+=1
+            ax.plot_trisurf(x, y,triangles, z)
+            plt.show();
+        if args.write_warping_csv:
+            x=section.mesh_nodes[:,0]
+            y=section.mesh_nodes[:,1]
+            z=section.section_props.omega
+            rows=np.empty([len(x),3],dtype=float)
+            rows[:,0]=x
+            rows[:,1]=y
+            rows[:,2]=z
+            fn=("rectangle-{0:g}-{1:g}-{2}.csv".
+                format(1000*args.width,1000*args.height,len(x)))
+            with open(fn, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(rows)
+            print("Wrote {0}".format(fn))
     itDiff=abs((it-it0)/it0)
     if(itDiff<rtol and iwDiff<rtol ):
         break
