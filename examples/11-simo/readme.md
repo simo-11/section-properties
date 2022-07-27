@@ -13,10 +13,11 @@ See
  * shear_warping_integrals in fea.py
 
 ### Changes
+Samples in [rectangle.py](rectangle.py) and [cold-formed-u.py](rectangle.py).
 
 #### matplotlib.pyplot plotting
 Usable but a bit limited 3D-plotting can be created e.g. using plot_trisurf in matplotlib.pyplot.
-Sample is available in [rectangle.py](rectangle.py) and [cold-formed-u.py](rectangle.py)
+
 ```
 runfile('C:/github/section-properties/examples/11-simo/rectangle.py',args='-H 1 -W 1 --plot_warping_values')
 Rectangle: width = 1 and height = 1, rtol=0.001
@@ -44,3 +45,22 @@ It = 0.141, Iw = 0.000134
 ..
 ![image](https://user-images.githubusercontent.com/1210784/181193045-34c49540-47ef-4b10-aa98-31479f368e90.png)
 
+#### write warping values to csv 
+```
+runfile('C:/github/section-properties/examples/11-simo/cold-formed-u.py',args='-A --write_warping_csv')
+Cold-formed-U: width = 0.05, height = 0.1,
+thickness= 0.004, outer radius=0.008, n_r=4
+rtol=0.001
+It = 3.91e-09, Iw = 2.75e-10
+Shear center: (-0.0166,0.05)
+Wrote USection-100x50x4-8-4-249.csv
+meshSize = 0.025, 249 nodes, 86 elements, itDiff = 1, iwDiff = 1
+It = 3.91e-09, Iw = 2.75e-10
+Shear center: (-0.0166,0.05)
+Wrote USection-100x50x4-8-4-267.csv
+```
+Usage in matlab e.g. for interpolation Work in Progress
+```
+t=readtable('C:/github/section-properties/examples/11-simo/USection-100x50x4-8-4-267.csv');
+Vq=interp2(t(:,1),t(:,2),t(:,3),[0.05 0.05 0.05],[0 0.002 0.004])
+```
