@@ -59,8 +59,9 @@ It = 3.91e-09, Iw = 2.75e-10
 Shear center: (-0.0166,0.05)
 Wrote USection-100x50x4-8-4-267.csv
 ```
-Usage in matlab e.g. for interpolation Work in Progress
+Usage in matlab e.g. for interpolation of scattered data
 ```
 t=readtable('C:/github/section-properties/examples/11-simo/USection-100x50x4-8-4-267.csv');
-Vq=interp2(t(:,1),t(:,2),t(:,3),[0.05 0.05 0.05],[0 0.002 0.004])
+F = scatteredInterpolant(t.x,t.y,t.w);
+F([0.05 0.05 0.05],[0 0.002 0.004])
 ```
