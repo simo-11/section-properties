@@ -64,4 +64,6 @@ Usage in matlab e.g. for interpolation of scattered data
 t=readtable('C:/github/section-properties/examples/11-simo/USection-100x50x4-8-4-267.csv');
 F = scatteredInterpolant(t.x,t.y,t.w);
 F([0.05 0.05 0.05],[0 0.002 0.004])
+ans =
+   -0.0032   -0.0033   -0.0034
 ```
