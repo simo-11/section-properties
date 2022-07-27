@@ -9,8 +9,8 @@ is not more than rtol
 import math
 import csv
 import argparse
-from sectionproperties.analysis.section import Section
-
+#from sectionproperties.analysis.section import Section
+import simo.dev
 import numpy as np
 from shapely.geometry import Polygon
 import sectionproperties.pre.geometry as geometry
@@ -77,28 +77,7 @@ if < thickness, 2*thickness is used""",
                     default=0,type=float)
 parser.add_argument("--n_r", help="number of points in radius, 0 or >1",
                     default=4,type=int)
-parser.add_argument("--rtol", help="relative tolerance",
-                    default=1e-3,type=float)
-parser.add_argument("-M","--plot_mesh", help="Plot each mesh",
-                    action="store_true")
-parser.add_argument("-G","--plot_geometry", help="Plot geometry",
-                    action="store_true")
-parser.add_argument("-P","--plot_section", help="Plot section",
-                    action="store_true")
-parser.add_argument("-B","--bending", help="show bending related constants",
-                    action="store_true")
-parser.add_argument("-F","--frame_analysis",
-                    help="show frame analysis results",
-                    action="store_true")
-parser.add_argument("-A","--run_analysis",
-                    help="run analysis",
-                    action="store_true")
-parser.add_argument("--plot_warping_values",
-                    help="plot warping values for each iteration",
-                    action="store_true")
-parser.add_argument("--write_warping_csv",
-                    help="write warping values for each iteration",
-                    action="store_true")
+simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 if args.n_r>0:
     if args.radius<args.thickness:
@@ -166,7 +145,7 @@ if args.run_analysis:
             ms=0.5*ms
             continue
         vertices0=vertices
-        section = Section(geometry)
+        section = simo.dev.DevSection(geometry)
         if args.plot_mesh:
             section.plot_mesh()
         section.calculate_geometric_properties()
@@ -239,6 +218,7 @@ if args.run_analysis:
                      args.n_r,len(x));
                 with open(fn, 'w', newline='') as csvfile:
                     writer = csv.writer(csvfile)
+                    writer.writerow(['x','y','w'])
                     writer.writerows(rows)
                 print("Wrote {0}".format(fn))
         itDiff=abs((it-it0)/it0)

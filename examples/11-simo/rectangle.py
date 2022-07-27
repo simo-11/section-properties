@@ -10,36 +10,18 @@ is not more than rtol
 import math
 import argparse
 import sectionproperties.pre.library.primitive_sections as sections
-from sectionproperties.analysis.section import Section
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
+#from sectionproperties.analysis.section import Section
+import simo.dev
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-W","--width", help="width of square",
                     default=0.0032024,type=float)
 parser.add_argument("-H","--height", help="height of square",
                     default=0.012377,type=float)
-parser.add_argument("-R","--rtol", help="relative tolerance",
-                    default=1e-3,type=float)
-parser.add_argument("-M","--plot_mesh", help="plot each mesh",
-                    action="store_true")
-parser.add_argument("-G","--plot_geometry", help="plot geometry",
-                    action="store_true")
-parser.add_argument("-B","--bending", help="show bending related constants",
-                    action="store_true")
-parser.add_argument("-F","--frame_analysis",
-                    help="show frame analysis results",
-                    action="store_true")
-parser.add_argument("-T","--time_info",
-                    help="show detailed info for computation",
-                    action="store_true")
-parser.add_argument("--plot_warping_values",
-                    help="plot warping values for each iteration",
-                    action="store_true")
-parser.add_argument("--write_warping_csv",
-                    help="write warping values for each iteration",
-                    action="store_true")
+simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
       format(args.width, args.height,args.rtol))
@@ -62,7 +44,7 @@ while True:
         ms=0.5*ms
         continue
     vertices0=vertices
-    section = Section(geometry, time_info=args.time_info)
+    section = simo.dev.DevSection(geometry, time_info=args.time_info)
     if args.plot_mesh:
         section.plot_mesh()
     section.calculate_geometric_properties()
@@ -132,6 +114,7 @@ while True:
                 format(1000*args.width,1000*args.height,len(x)))
             with open(fn, 'w', newline='') as csvfile:
                 writer = csv.writer(csvfile)
+                writer.writerow(['x','y','w'])
                 writer.writerows(rows)
             print("Wrote {0}".format(fn))
     itDiff=abs((it-it0)/it0)
