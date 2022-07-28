@@ -45,25 +45,45 @@ It = 0.141, Iw = 0.000134
 ..
 ![image](https://user-images.githubusercontent.com/1210784/181193045-34c49540-47ef-4b10-aa98-31479f368e90.png)
 
-#### write warping values to csv 
+#### write coordinates, warping and triangles to csv 
+ * --write_warping_csv
+   * coordinates for nodes x, y 
+   * warping value w 
+ * --write_triangles_csv
+   * triangles for visualization
+   * each parabolic (six noded) triangle is subdivided to four three noded triangles 
+   * indexes are 0-based
 ```
-runfile('C:/github/section-properties/examples/11-simo/cold-formed-u.py',args='-A --write_warping_csv')
+runfile('C:/github/section-properties/examples/11-simo/cold-formed-u.py',args='-A -B --write_warping_csv --write_triangles_csv')
 Cold-formed-U: width = 0.05, height = 0.1,
 thickness= 0.004, outer radius=0.008, n_r=4
 rtol=0.001
+A = 0.000744, Ixx = 1.81e-07, Iyy = 1.12e-06, Ixy = 2.12e-22
+Centroid: (0.0144,0.05)
 It = 3.91e-09, Iw = 2.75e-10
 Shear center: (-0.0166,0.05)
 Wrote USection-100x50x4-8-4-249.csv
+Wrote USection-tri-100x50x4-8-4-249.csv
 meshSize = 0.025, 249 nodes, 86 elements, itDiff = 1, iwDiff = 1
 It = 3.91e-09, Iw = 2.75e-10
 Shear center: (-0.0166,0.05)
 Wrote USection-100x50x4-8-4-267.csv
+Wrote USection-tri-100x50x4-8-4-267.csv
 ```
-Usage in matlab e.g. for interpolation of scattered data
+##### Usage in matlab for interpolation of scattered data
 ```
 t=readtable('C:/github/section-properties/examples/11-simo/USection-100x50x4-8-4-267.csv');
 F = scatteredInterpolant(t.x,t.y,t.w);
 F([0.05 0.05 0.05],[0 0.002 0.004])
 ans =
    -0.0032   -0.0033   -0.0034
+```
+
+##### Usage in matlab e.g. for plotting
+```
+t=readtable('C:/github/section-properties/examples/11-simo/USection-100x50x4-8-4-267.csv');
+t2=readtable('C:/github/section-properties/examples/11-simo/USection-tri-100x50x4-8-4-267.csv');
+T=[t2.f, t2.s, t2.t]+1; % +1 to get proper indexes to coordinates in t
+TO=triangulation(T,t.x,t.y,t.w);
+trisurf(TO)
 ```
