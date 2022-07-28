@@ -94,7 +94,7 @@ show_section('USection','100x50x4-8-4-267');
 ```
 Use daspect command in matlab to scale data for viewing e.g. instead of default [1 1 1] due to axis equal
 ```
-daspect([1 1 0.1])
+daspect([1 1 0.2])
 ```
 ![image](https://user-images.githubusercontent.com/1210784/181523464-fcfa25a5-6be3-4f1d-bf58-70d1d6397418.png)
 ..
