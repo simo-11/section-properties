@@ -7,7 +7,6 @@ Mesh is refined until relative change of torsion and warping constants
 is not more than rtol
 """
 import math
-import csv
 import argparse
 #from sectionproperties.analysis.section import Section
 import simo.dev
@@ -152,6 +151,8 @@ if args.run_analysis:
         if bending:
             print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
                   .format(section.get_area(),*section.get_ic()))
+            print(("Centroid: ({0:.3g},{1:.3g})".format(*section.get_c()))
+                  .format(section.get_area(),*section.get_ic()))
             bending=False
         if frame_analysis:
             (area, ixx, iyy, ixy, it, phi)=section.calculate_frame_properties()
@@ -178,49 +179,21 @@ if args.run_analysis:
                 x=section.mesh_nodes[:,0]
                 y=section.mesh_nodes[:,1]
                 z=section.section_props.omega
-                ma=section.mesh_elements
-                ne=len(ma)
-                nt=4*ne
-                ti=0
-                # triangles
-                triangles=np.empty([nt, 3],dtype=int)
-                for i in range(0,ne):
-                    me=ma[i]
-                    triangles[ti,0]=me[0]
-                    triangles[ti,1]=me[3]
-                    triangles[ti,2]=me[5]
-                    ti+=1
-                    triangles[ti,0]=me[3]
-                    triangles[ti,1]=me[1]
-                    triangles[ti,2]=me[4]
-                    ti+=1
-                    triangles[ti,0]=me[3]
-                    triangles[ti,1]=me[4]
-                    triangles[ti,2]=me[5]
-                    ti+=1
-                    triangles[ti,0]=me[5]
-                    triangles[ti,1]=me[4]
-                    triangles[ti,2]=me[2]
-                    ti+=1
+                triangles=section.get_triangles()
                 ax.plot_trisurf(x, y,triangles, z)
                 plt.show();
             if args.write_warping_csv:
-                x=section.mesh_nodes[:,0]
-                y=section.mesh_nodes[:,1]
-                z=section.section_props.omega
-                rows=np.empty([len(x),3],dtype=float)
-                rows[:,0]=x
-                rows[:,1]=y
-                rows[:,2]=z
                 fn='USection-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
                      *tuple([f * 1000 for f in
                         (args.height,args.width,args.thickness,args.radius)]),
-                     args.n_r,len(x));
-                with open(fn, 'w', newline='') as csvfile:
-                    writer = csv.writer(csvfile)
-                    writer.writerow(['x','y','w'])
-                    writer.writerows(rows)
-                print("Wrote {0}".format(fn))
+                     args.n_r,len(section.section_props.omega));
+                section.write_warping_csv(fn)
+            if args.write_triangles_csv:
+                fn='USection-tri-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
+                     *tuple([f * 1000 for f in
+                        (args.height,args.width,args.thickness,args.radius)]),
+                     args.n_r,len(section.section_props.omega));
+                section.write_triangles_csv(fn)
         itDiff=abs((it-it0)/it0)
         if(itDiff<rtol and iwDiff<rtol ):
             break

@@ -11,8 +11,6 @@ import math
 import argparse
 import sectionproperties.pre.library.primitive_sections as sections
 import matplotlib.pyplot as plt
-import numpy as np
-import csv
 #from sectionproperties.analysis.section import Section
 import simo.dev
 parser = argparse.ArgumentParser(
@@ -76,47 +74,19 @@ while True:
             x=section.mesh_nodes[:,0]
             y=section.mesh_nodes[:,1]
             z=section.section_props.omega
-            ma=section.mesh_elements
-            ne=len(ma)
-            nt=4*ne
-            ti=0
-            # triangles
-            triangles=np.empty([nt, 3],dtype=int)
-            for i in range(0,ne):
-                me=ma[i]
-                triangles[ti,0]=me[0]
-                triangles[ti,1]=me[3]
-                triangles[ti,2]=me[5]
-                ti+=1
-                triangles[ti,0]=me[3]
-                triangles[ti,1]=me[1]
-                triangles[ti,2]=me[4]
-                ti+=1
-                triangles[ti,0]=me[3]
-                triangles[ti,1]=me[4]
-                triangles[ti,2]=me[5]
-                ti+=1
-                triangles[ti,0]=me[5]
-                triangles[ti,1]=me[4]
-                triangles[ti,2]=me[2]
-                ti+=1
+            triangles=section.get_triangles()
             ax.plot_trisurf(x, y,triangles, z)
             plt.show();
         if args.write_warping_csv:
-            x=section.mesh_nodes[:,0]
-            y=section.mesh_nodes[:,1]
-            z=section.section_props.omega
-            rows=np.empty([len(x),3],dtype=float)
-            rows[:,0]=x
-            rows[:,1]=y
-            rows[:,2]=z
             fn=("rectangle-{0:g}-{1:g}-{2}.csv".
-                format(1000*args.width,1000*args.height,len(x)))
-            with open(fn, 'w', newline='') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(['x','y','w'])
-                writer.writerows(rows)
-            print("Wrote {0}".format(fn))
+                format(1000*args.width,1000*args.height,
+                       len(section.section_props.omega)))
+            section.write_warping_csv(fn)
+        if args.write_triangles_csv:
+            fn=("rectangle-tri-{0:g}-{1:g}-{2}.csv".
+                format(1000*args.width,1000*args.height,
+                       len(section.section_props.omega)))
+            section.write_triangles_csv(fn)
     itDiff=abs((it-it0)/it0)
     if(itDiff<rtol and iwDiff<rtol ):
         break
