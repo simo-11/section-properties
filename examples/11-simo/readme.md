@@ -86,4 +86,10 @@ t2=readtable('C:/github/section-properties/examples/11-simo/USection-tri-100x50x
 T=[t2.f, t2.s, t2.t]+1; % +1 to get proper indexes to coordinates in t
 TO=triangulation(T,t.x,t.y,t.w);
 trisurf(TO)
+axis equal;
 ```
+Or using ancf-rhs\cross-section\show_section
+```
+show_section('USection','100x50x4-8-4-267');
+```
+
