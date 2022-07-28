@@ -92,4 +92,12 @@ Or using ancf-rhs\cross-section\show_section
 ```
 show_section('USection','100x50x4-8-4-267');
 ```
+Use daspect command in matlab to scale data for viewing e.g.
+```
+daspect([1 1 0.1])
+```
+Using default [1 1 1] due to axis equal
+![image](https://user-images.githubusercontent.com/1210784/181523464-fcfa25a5-6be3-4f1d-bf58-70d1d6397418.png)
+to [1 1 0.1]
+![image](https://user-images.githubusercontent.com/1210784/181523584-a583d1db-8aca-4058-a63b-55e7a41bbb1d.png)
 
