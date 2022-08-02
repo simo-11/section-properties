@@ -67,7 +67,7 @@ class DevSection(Section):
 
 def add_common_arguments(parser):
     parser.add_argument("--rtol", help="relative tolerance",
-                        default=1e-3,type=float)
+                        default=1e-2,type=float)
     parser.add_argument("-M","--plot_mesh", help="plot each mesh",
                         action="store_true")
     parser.add_argument("-G","--plot_geometry", help="plot geometry",
