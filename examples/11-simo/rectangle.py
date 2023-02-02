@@ -10,7 +10,6 @@ is not more than rtol
 import math
 import argparse
 import sectionproperties.pre.library.primitive_sections as sections
-import matplotlib.pyplot as plt
 #from sectionproperties.analysis.section import Section
 import simo.dev
 parser = argparse.ArgumentParser(
@@ -21,6 +20,7 @@ parser.add_argument("-H","--height", help="height of square",
                     default=0.012377,type=float)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
+simo.dev.check_arguments(parser,args)
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
       format(args.width, args.height,args.rtol))
 rtol=args.rtol
@@ -34,7 +34,7 @@ it0=a
 iw0=a
 ms=min(args.width,args.height)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
-while True:
+while args.run_analysis and True:
     ms=0.5*ms
     geometry.create_mesh(mesh_sizes=[ms])
     vertices=geometry.mesh.get('vertices').size
@@ -66,17 +66,7 @@ while True:
         iwDiff=abs((iw-iw0)/iw0)
         print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
         if args.plot_warping_values:
-            fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-            # Axes3D currently only supports the aspect argument 'auto'.
-            #   You passed in 1
-            # ax.set_adjustable('box')
-            # ax.set_aspect(1)
-            x=section.mesh_nodes[:,0]
-            y=section.mesh_nodes[:,1]
-            z=section.section_props.omega
-            triangles=section.get_triangles()
-            ax.plot_trisurf(x, y,triangles, z)
-            plt.show();
+            section.plot_warping_values()
         if args.write_warping_csv:
             fn=("rectangle-{0:g}-{1:g}-{2}.csv".
                 format(1000*args.width,1000*args.height,

@@ -78,6 +78,7 @@ parser.add_argument("--n_r", help="number of points in radius, 0 or >1",
                     default=4,type=int)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
+simo.dev.check_arguments(parser,args)
 if args.n_r>0:
     if args.radius<args.thickness:
         args.radius=2*args.thickness
@@ -171,17 +172,7 @@ if args.run_analysis:
             print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
             print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
             if args.plot_warping_values:
-                fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-                # Axes3D currently only supports the aspect argument 'auto'.
-                #   You passed in 1
-                # ax.set_adjustable('box')
-                # ax.set_aspect(1)
-                x=section.mesh_nodes[:,0]
-                y=section.mesh_nodes[:,1]
-                z=section.section_props.omega
-                triangles=section.get_triangles()
-                ax.plot_trisurf(x, y,triangles, z)
-                plt.show();
+                section.plot_warping_values()
             if args.write_warping_csv:
                 fn='USection-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
                      *tuple([f * 1000 for f in

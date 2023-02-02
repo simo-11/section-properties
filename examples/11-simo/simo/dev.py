@@ -8,6 +8,7 @@ Created on Wed Jul 27 16:36:57 2022
 from sectionproperties.analysis.section import Section
 import numpy as np
 import csv
+import matplotlib.pyplot as plt
 
 class DevSection(Section):
     def __init__(self,*args, **kwargs):
@@ -42,6 +43,22 @@ class DevSection(Section):
                 ti+=1
             self.triangles=triangles
         return self.triangles
+
+    def plot_warping_values(self):
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        # Axes3D currently only supports the aspect argument 'auto'.
+        #   You passed in 1
+        # ax.set_adjustable('box')
+        # ax.set_aspect(1)
+        x=self.mesh_nodes[:,0]
+        y=self.mesh_nodes[:,1]
+        z=self.section_props.omega
+        triangles=self.get_triangles()
+        ax.plot_trisurf(x, y,triangles, z)
+        title=('{0} nodes, {1} elements'.format
+            (self.num_nodes,len(self.elements)))
+        ax.set_title(title)
+        plt.show();
 
     def write_warping_csv(self,fn):
         x=self.mesh_nodes[:,0]
@@ -94,3 +111,8 @@ def add_common_arguments(parser):
     parser.add_argument("--write_triangles_csv",
                         help="write triangles for each iteration",
                         action="store_true")
+
+def check_arguments(parser,args):
+    if (not args.plot_section and not args.plot_geometry
+        and not args.run_analysis):
+        parser.print_help()
