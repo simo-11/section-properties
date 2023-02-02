@@ -13,7 +13,8 @@ See
  * shear_warping_integrals in fea.py
 
 ### Changes
-Samples in [rectangle.py](rectangle.py) and [cold-formed-u.py](rectangle.py).
+Samples in [rectangle.py](rectangle.py) and [cold-formed-u.py](cold-formed-u.py).
+Common parts in [dev.py](simo/dev.py)
 
 #### matplotlib.pyplot plotting
 Usable but a bit limited 3D-plotting can be created e.g. using plot_trisurf in matplotlib.pyplot.
