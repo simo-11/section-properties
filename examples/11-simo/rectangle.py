@@ -32,14 +32,13 @@ if args.plot_geometry:
 a=geometry.calculate_area()
 it0=a
 iw0=a
-ms=min(args.width,args.height)
+ms=math.pow(min(args.width,args.height),2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
 while args.run_analysis and True:
-    ms=0.5*ms
+    ms=0.82*ms
     geometry.create_mesh(mesh_sizes=[ms])
     vertices=geometry.mesh.get('vertices').size
     if vertices0==vertices:
-        ms=0.5*ms
         continue
     vertices0=vertices
     section = simo.dev.DevSection(geometry, time_info=args.time_info)
@@ -78,12 +77,12 @@ while args.run_analysis and True:
                        len(section.section_props.omega)))
             section.write_triangles_csv(fn)
     itDiff=abs((it-it0)/it0)
+    print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
+                  "itDiff = {1:.3g}, iwDiff = {2:.3g}")
+          .format(ms,itDiff,iwDiff,
+                  section.num_nodes,len(section.elements)))
     if(itDiff<rtol and iwDiff<rtol ):
         break
     else:
         it0=it
         iw0=iw
-        print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
-                      "itDiff = {1:.3g}, iwDiff = {2:.3g}")
-              .format(ms,itDiff,iwDiff,
-                  section.num_nodes,len(section.elements)))

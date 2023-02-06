@@ -86,8 +86,8 @@ if args.n_r>0:
        args.n_r=2
 else:
     args.radius=0
-print("""Cold-formed-U: width = {0:.5g}, height = {1:.5g},
-thickness= {2:.5g}, outer radius={3:.5g}, n_r={4}
+print("""Cold-formed-U: width={0:.5g}, height={1:.5g},
+thickness={2:.5g}, outer radius={3:.5g}, n_r={4}
 rtol={5:g}""".
       format(args.width, args.height,args.thickness,
              args.radius,args.n_r,args.rtol))
@@ -134,15 +134,14 @@ if args.plot_geometry:
 a=geometry.calculate_area()
 it0=a
 iw0=a
-ms=min(args.width,args.height)
+ms=math.pow(4*args.thickness,2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
 if args.run_analysis:
     while True:
-        ms=0.5*ms
+        ms=0.82*ms
         geometry.create_mesh(mesh_sizes=[ms])
         vertices=geometry.mesh.get('vertices').size
         if vertices0==vertices:
-            ms=0.5*ms
             continue
         vertices0=vertices
         section = simo.dev.DevSection(geometry)
@@ -186,13 +185,13 @@ if args.run_analysis:
                      args.n_r,len(section.section_props.omega));
                 section.write_triangles_csv(fn)
         itDiff=abs((it-it0)/it0)
+        print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
+                      "itDiff = {1:.3g}, iwDiff = {2:.3g}")
+              .format(ms,itDiff,iwDiff,
+                  section.num_nodes,len(section.elements)))
         if(itDiff<rtol and iwDiff<rtol ):
             break
         else:
             it0=it
             iw0=iw
-            print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
-                          "itDiff = {1:.3g}, iwDiff = {2:.3g}")
-                  .format(ms,itDiff,iwDiff,
-                      section.num_nodes,len(section.elements)))
     section.plot_centroids()
