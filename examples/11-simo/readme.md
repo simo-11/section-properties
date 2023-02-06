@@ -13,13 +13,14 @@ See
  * shear_warping_integrals in fea.py
 
 ### Changes
-Samples in [rectangle.py](rectangle.py) and [cold-formed-u.py](rectangle.py).
+Samples in [rectangle.py](rectangle.py) and [cold-formed-u.py](cold-formed-u.py).
+Common parts in [dev.py](simo/dev.py)
 
 #### matplotlib.pyplot plotting
 Usable but a bit limited 3D-plotting can be created e.g. using plot_trisurf in matplotlib.pyplot.
 
 ```
-runfile('C:/github/section-properties/examples/11-simo/rectangle.py',args='-H 1 -W 1 --plot_warping_values')
+runfile('C:/github/section-properties/examples/11-simo/rectangle.py',args='-H 1 -W 1 --plot_warping_values -A --rtol=0.001')
 Rectangle: width = 1 and height = 1, rtol=0.001
 It = 0.167, Iw = -5.42e-20
 meshSize = 0.5, 9 nodes, 2 elements, itDiff = 0.833, iwDiff = 1
