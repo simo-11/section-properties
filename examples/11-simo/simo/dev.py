@@ -14,6 +14,7 @@ class DevSection(Section):
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
         self.triangles=None
+        self.args=None
     """
     """
     def get_triangles(self):
@@ -44,12 +45,18 @@ class DevSection(Section):
             self.triangles=triangles
         return self.triangles
 
+    def set_args(self,args):
+        self.args=args
+
+    def get_box_aspect(self):
+        if self.args is None:
+            return (4,4,2)
+        z=min(self.args.width,self.args.height)*self.args.z_scale
+        return (self.args.width,self.args.height,z)
+
     def plot_warping_values(self):
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        # Axes3D currently only supports the aspect argument 'auto'.
-        #   You passed in 1
-        # ax.set_adjustable('box')
-        # ax.set_aspect(1)
+        ax.set_box_aspect(self.get_box_aspect())
         x=self.mesh_nodes[:,0]
         y=self.mesh_nodes[:,1]
         z=self.section_props.omega
@@ -105,6 +112,8 @@ def add_common_arguments(parser):
     parser.add_argument("--plot_warping_values",
                         help="plot warping values for each iteration",
                         action="store_true")
+    parser.add_argument("--z_scale", help="scaling of z in plot_warpin_values",
+                        default=0.5,type=float)
     parser.add_argument("--write_warping_csv",
                         help="write warping values for each iteration",
                         action="store_true")

@@ -42,6 +42,7 @@ while args.run_analysis and True:
         continue
     vertices0=vertices
     section = simo.dev.DevSection(geometry, time_info=args.time_info)
+    section.set_args(args)
     if args.plot_mesh:
         section.plot_mesh()
     section.calculate_geometric_properties()

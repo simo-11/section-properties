@@ -145,6 +145,7 @@ if args.run_analysis:
             continue
         vertices0=vertices
         section = simo.dev.DevSection(geometry)
+        section.set_args(args)
         if args.plot_mesh:
             section.plot_mesh()
         section.calculate_geometric_properties()
