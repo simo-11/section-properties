@@ -32,8 +32,9 @@ if args.plot_geometry:
 a=geometry.calculate_area()
 it0=a
 iw0=a
-ms=math.pow(min(args.width,args.height),2)
+ms=math.pow(min(args.width,args.height)/2,2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
+section=None
 while args.run_analysis and True:
     ms=0.82*ms
     geometry.create_mesh(mesh_sizes=[ms])

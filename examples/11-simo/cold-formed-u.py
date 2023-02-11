@@ -134,7 +134,7 @@ if args.plot_geometry:
 a=geometry.calculate_area()
 it0=a
 iw0=a
-ms=math.pow(4*args.thickness,2)
+ms=math.pow(6*args.thickness,2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
 if args.run_analysis:
     while True:
