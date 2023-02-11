@@ -22,29 +22,36 @@ Usable but a bit limited 3D-plotting can be created e.g. using plot_trisurf in m
 ```
 runfile('C:/github/section-properties/examples/11-simo/rectangle.py',args='-H 1 -W 1 --plot_warping_values -A --rtol=0.001')
 Rectangle: width = 1 and height = 1, rtol=0.001
-It = 0.167, Iw = -5.42e-20
-meshSize = 0.5, 9 nodes, 2 elements, itDiff = 0.833, iwDiff = 1
-It = 0.167, Iw = -4.24e-22
-meshSize = 0.25, 13 nodes, 4 elements, itDiff = 3.33e-16, iwDiff = 0.992
 It = 0.146, Iw = 0.000174
-meshSize = 0.125, 25 nodes, 8 elements, itDiff = 0.125, iwDiff = 4.1e+17
+meshSize = 0.205, 25 nodes, 8 elements, itDiff = 0.854, iwDiff = 1
 It = 0.143, Iw = 0.000156
-meshSize = 0.0625, 41 nodes, 16 elements, itDiff = 0.0204, iwDiff = 0.102
+meshSize = 0.113, 41 nodes, 16 elements, itDiff = 0.0204, iwDiff = 0.102
+It = 0.141, Iw = 0.000133
+meshSize = 0.0623, 73 nodes, 28 elements, itDiff = 0.012, iwDiff = 0.146
+It = 0.141, Iw = 0.000132
+meshSize = 0.0419, 85 nodes, 34 elements, itDiff = 0.000743, iwDiff = 0.00728
 It = 0.141, Iw = 0.000136
-meshSize = 0.0312, 101 nodes, 42 elements, itDiff = 0.0133, iwDiff = 0.125
+meshSize = 0.0344, 101 nodes, 42 elements, itDiff = 0.0005, iwDiff = 0.0316
+It = 0.141, Iw = 0.000138
+meshSize = 0.0282, 145 nodes, 64 elements, itDiff = 0.00121, iwDiff = 0.00952
+It = 0.141, Iw = 0.000135
+meshSize = 0.0231, 163 nodes, 70 elements, itDiff = 0.000712, iwDiff = 0.0179
 It = 0.141, Iw = 0.000136
-meshSize = 0.0156, 226 nodes, 101 elements, itDiff = 0.00196, iwDiff = 0.00344
-It = 0.141, Iw = 0.000135
-meshSize = 0.00781, 441 nodes, 204 elements, itDiff = 0.000631, iwDiff = 0.0085
-It = 0.141, Iw = 0.000135
-meshSize = 0.00391, 875 nodes, 414 elements, itDiff = 9.25e-05, iwDiff = 0.00145
+meshSize = 0.0189, 194 nodes, 85 elements, itDiff = 1.15e-05, iwDiff = 0.00513
 It = 0.141, Iw = 0.000134
+meshSize = 0.0155, 236 nodes, 103 elements, itDiff = 0.000415, iwDiff = 0.0108
+It = 0.141, Iw = 0.000135
+meshSize = 0.0127, 283 nodes, 126 elements, itDiff = 2.25e-05, iwDiff = 0.00604
+It = 0.141, Iw = 0.000135
+meshSize = 0.0104, 338 nodes, 153 elements, itDiff = 0.000111, iwDiff = 0.00332
+It = 0.141, Iw = 0.000135
+meshSize = 0.00857, 401 nodes, 184 elements, itDiff = 0.000111, iwDiff = 0.000247
 ```
-![image](https://user-images.githubusercontent.com/1210784/181192924-d4a3a8c4-e9c9-48e5-b856-8a9118d6f1ac.png)
+![image](https://user-images.githubusercontent.com/1210784/218270574-bd96f8fc-b424-4c5c-8935-d090531b7151.png)
 ..
-![image](https://user-images.githubusercontent.com/1210784/181192982-88108a68-e043-4a60-97b1-2fe65506ae38.png)
+![image](https://user-images.githubusercontent.com/1210784/218270602-a13d46d0-77de-4c03-9ace-ee667b0cd00b.png)
 ..
-![image](https://user-images.githubusercontent.com/1210784/181193045-34c49540-47ef-4b10-aa98-31479f368e90.png)
+![image](https://user-images.githubusercontent.com/1210784/218270622-84012158-5339-4198-954f-d338a41e3022.png)
 
 #### write coordinates, warping and triangles to csv 
  * --write_warping_csv
