@@ -18,7 +18,7 @@ class DevSection(Section):
     """
     """
     def get_triangles(self):
-        if self.triangles == None:
+        if not isinstance(self.triangles,np.ndarray):
             ma=self.mesh_elements
             ne=len(ma)
             nt=4*ne
