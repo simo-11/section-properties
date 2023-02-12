@@ -397,14 +397,6 @@ class Section:
 
             # ILU decomposition of stiffness matrices
             def ilu_decomp(progress=None, task=None):
-                # ILU decomposition on regular stiffness matrix
-                k_precond = linalg.LinearOperator(
-                    (self.num_nodes, self.num_nodes), linalg.spilu(k).solve
-                )
-
-                if progress is not None:
-                    progress.update(task, advance=1)
-
                 # ILU decomposition on Lagrangian stiffness matrix
                 k_lg_precond = linalg.LinearOperator(
                     (self.num_nodes + 1, self.num_nodes + 1), linalg.spilu(k_lg).solve
@@ -413,7 +405,7 @@ class Section:
                 if progress is not None:
                     progress.update(task, advance=1)
 
-                return (k_precond, k_lg_precond)
+                return k_lg_precond
 
             # if the cgs method is used, perform ILU decomposition
             if solver_type == "cgs":
@@ -422,14 +414,14 @@ class Section:
                         description="[red]Performing ILU decomposition",
                         total=2,
                     )
-                    (k_precond, k_lg_precond) = ilu_decomp(progress=progress, task=task)
+                    k_lg_precond = ilu_decomp(progress=progress, task=task)
 
                     progress.update(
                         task,
                         description="[green]:white_check_mark: ILU decomposition complete",
                     )
                 else:
-                    (k_precond, k_lg_precond) = ilu_decomp()
+                    k_lg_precond = ilu_decomp()
 
             # solve for warping function
             def solve_warping():
