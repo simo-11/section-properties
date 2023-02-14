@@ -91,7 +91,6 @@ thickness={2:.5g}, outer radius={3:.5g}, n_r={4}
 rtol={5:g}""".
       format(args.width, args.height,args.thickness,
              args.radius,args.n_r,args.rtol))
-rtol=args.rtol
 bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = u_section(args.height, args.width,
@@ -136,63 +135,60 @@ it0=a
 iw0=a
 ms=math.pow(6*args.thickness,2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
-if args.run_analysis:
-    while True:
-        ms=0.82*ms
-        geometry.create_mesh(mesh_sizes=[ms])
-        vertices=geometry.mesh.get('vertices').size
-        if vertices0==vertices:
+while simo.dev.run(args):
+    ms=0.82*ms
+    if args.mesh_size:
+        ms=args.mesh_size
+    geometry.create_mesh(mesh_sizes=[ms])
+    vertices=geometry.mesh.get('vertices').size
+    if vertices0==vertices:
+        continue
+    vertices0=vertices
+    section = simo.dev.DevSection(geometry)
+    section.set_args(args)
+    if args.plot_mesh:
+        section.plot_mesh()
+    section.calculate_geometric_properties()
+    if bending:
+        print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
+              .format(section.get_area(),*section.get_ic()))
+        print(("Centroid: ({0:.3g},{1:.3g})".format(*section.get_c()))
+              .format(section.get_area(),*section.get_ic()))
+        bending=False
+    if frame_analysis:
+        (area, ixx, iyy, ixy, it, phi)=section.calculate_frame_properties()
+        print(("f: A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, "+
+               "Ixy = {3:.3g}, J = {4:.3g}")
+              .format(area,ixx,iyy,ixy,it))
+        iwDiff=0
+        iw=0
+    else:
+        section.calculate_warping_properties()
+        it = section.get_j()
+        if math.isnan(it):
             continue
-        vertices0=vertices
-        section = simo.dev.DevSection(geometry)
-        section.set_args(args)
-        if args.plot_mesh:
-            section.plot_mesh()
-        section.calculate_geometric_properties()
-        if bending:
-            print(("A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, Ixy = {3:.3g}")
-                  .format(section.get_area(),*section.get_ic()))
-            print(("Centroid: ({0:.3g},{1:.3g})".format(*section.get_c()))
-                  .format(section.get_area(),*section.get_ic()))
-            bending=False
-        if frame_analysis:
-            (area, ixx, iyy, ixy, it, phi)=section.calculate_frame_properties()
-            print(("f: A = {0:.3g}, Ixx = {2:.3g}, Iyy = {1:.3g}, "+
-                   "Ixy = {3:.3g}, J = {4:.3g}")
-                  .format(area,ixx,iyy,ixy,it))
-            iwDiff=0
-            iw=0
-        else:
-            section.calculate_warping_properties()
-            it = section.get_j()
-            if math.isnan(it):
-                continue
-            iw = section.get_gamma()
-            iwDiff=abs((iw-iw0)/iw0)
-            print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
-            print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
-            if args.plot_warping_values:
-                section.plot_warping_values()
-            if args.write_warping_csv:
-                fn='USection-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
-                     *tuple([f * 1000 for f in
-                        (args.height,args.width,args.thickness,args.radius)]),
-                     args.n_r,len(section.section_props.omega));
-                section.write_warping_csv(fn)
-            if args.write_triangles_csv:
-                fn='USection-tri-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
-                     *tuple([f * 1000 for f in
-                        (args.height,args.width,args.thickness,args.radius)]),
-                     args.n_r,len(section.section_props.omega));
-                section.write_triangles_csv(fn)
-        itDiff=abs((it-it0)/it0)
-        print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
-                      "itDiff = {1:.3g}, iwDiff = {2:.3g}")
-              .format(ms,itDiff,iwDiff,
-                  section.num_nodes,len(section.elements)))
-        if(itDiff<rtol and iwDiff<rtol ):
-            break
-        else:
-            it0=it
-            iw0=iw
+        iw = section.get_gamma()
+        iwDiff=abs((iw-iw0)/iw0)
+        print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
+        print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
+        if args.plot_warping_values:
+            section.plot_warping_values()
+        if args.write_warping_csv:
+            fn='USection-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
+                 *tuple([f * 1000 for f in
+                    (args.height,args.width,args.thickness,args.radius)]),
+                 args.n_r,len(section.section_props.omega));
+            section.write_warping_csv(fn)
+        if args.write_triangles_csv:
+            fn='USection-tri-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
+                 *tuple([f * 1000 for f in
+                    (args.height,args.width,args.thickness,args.radius)]),
+                 args.n_r,len(section.section_props.omega));
+            section.write_triangles_csv(fn)
+    itDiff=abs((it-it0)/it0)
+    if section.done(ms,itDiff,iwDiff):
+        break
+    else:
+        it0=it
+        iw0=iw
     section.plot_centroids()

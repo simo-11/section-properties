@@ -65,7 +65,8 @@ class DevSection(Section):
         title=('{0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements)))
         ax.set_title(title)
-        plt.show();
+        plt.show()
+        return (fig,ax)
 
     def write_warping_csv(self,fn):
         x=self.mesh_nodes[:,0]
@@ -89,16 +90,32 @@ class DevSection(Section):
             writer.writerows(rows)
         print("Wrote {0}".format(fn))
 
+    def done(self,ms,itDiff,iwDiff):
+        if self.args.mesh_size:
+            print(("meshSize = {0:.3g}, {1} nodes, {2} elements")
+              .format(ms,self.num_nodes,len(self.elements)))
+        else:
+            print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
+                 "itDiff = {1:.3g}, iwDiff = {2:.3g}")
+              .format(ms,itDiff,iwDiff,
+                      self.num_nodes,len(self.elements)))
+        return self.args.mesh_size or (
+            itDiff<self.args.rtol and iwDiff<self.args.rtol)
+
 def add_common_arguments(parser):
     parser.add_argument("--rtol", help="relative tolerance",
                         default=1e-2,type=float)
+    parser.add_argument("--mesh_size",
+                        help="fixed meshSize, rtol is not used",
+                        type=float)
     parser.add_argument("-M","--plot_mesh", help="plot each mesh",
                         action="store_true")
     parser.add_argument("-G","--plot_geometry", help="plot geometry",
                         action="store_true")
     parser.add_argument("-P","--plot_section", help="Plot section",
                     action="store_true")
-    parser.add_argument("-B","--bending", help="show bending related constants",
+    parser.add_argument("-B","--bending",
+                        help="show bending related constants",
                         action="store_true")
     parser.add_argument("-F","--frame_analysis",
                         help="show frame analysis results",
@@ -123,5 +140,9 @@ def add_common_arguments(parser):
 
 def check_arguments(parser,args):
     if (not args.plot_section and not args.plot_geometry
-        and not args.run_analysis):
+        and not args.run_analysis and not args.mesh_size
+        and not args.plot_warping_values):
         parser.print_help()
+
+def run(args):
+    return (args.run_analysis or args.mesh_size or args.plot_warping_values)

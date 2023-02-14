@@ -5,7 +5,7 @@ Rectangle
 
 Calculate section properties of rectangle.
 Mesh is refined until relative change of torsion and warping constants
-is not more than rtol
+is not more than rtol unless mesh_size is given
 """
 import math
 import argparse
@@ -23,7 +23,6 @@ args = parser.parse_args()
 simo.dev.check_arguments(parser,args)
 print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
       format(args.width, args.height,args.rtol))
-rtol=args.rtol
 bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = sections.rectangular_section(args.width, args.height)
@@ -35,8 +34,10 @@ iw0=a
 ms=math.pow(min(args.width,args.height)/2,2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
 section=None
-while args.run_analysis and True:
+while simo.dev.run(args):
     ms=0.82*ms
+    if args.mesh_size:
+        ms=args.mesh_size
     geometry.create_mesh(mesh_sizes=[ms])
     vertices=geometry.mesh.get('vertices').size
     if vertices0==vertices:
@@ -79,11 +80,7 @@ while args.run_analysis and True:
                        len(section.section_props.omega)))
             section.write_triangles_csv(fn)
     itDiff=abs((it-it0)/it0)
-    print(("meshSize = {0:.3g}, {3} nodes, {4} elements, "+
-                  "itDiff = {1:.3g}, iwDiff = {2:.3g}")
-          .format(ms,itDiff,iwDiff,
-                  section.num_nodes,len(section.elements)))
-    if(itDiff<rtol and iwDiff<rtol ):
+    if section.done(ms,itDiff,iwDiff):
         break
     else:
         it0=it
