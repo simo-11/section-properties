@@ -21,8 +21,8 @@ parser.add_argument("-H","--height", help="height of square",
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 simo.dev.check_arguments(parser,args)
-print("Rectangle: width = {0:.5g} and height = {1:.5g}, rtol={2:g}".
-      format(args.width, args.height,args.rtol))
+print("Rectangle: width = {0:.5g} and height = {1:.5g}".
+      format(args.width, args.height))
 bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = sections.rectangular_section(args.width, args.height)

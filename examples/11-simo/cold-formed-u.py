@@ -87,10 +87,9 @@ if args.n_r>0:
 else:
     args.radius=0
 print("""Cold-formed-U: width={0:.5g}, height={1:.5g},
-thickness={2:.5g}, outer radius={3:.5g}, n_r={4}
-rtol={5:g}""".
+thickness={2:.5g}, outer radius={3:.5g}, n_r={4}""".
       format(args.width, args.height,args.thickness,
-             args.radius,args.n_r,args.rtol))
+             args.radius,args.n_r))
 bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = u_section(args.height, args.width,

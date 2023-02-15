@@ -8,6 +8,7 @@ Created on Wed Jul 27 16:36:57 2022
 from sectionproperties.analysis.section import Section
 import numpy as np
 import csv
+import math
 import matplotlib.pyplot as plt
 
 class DevSection(Section):
@@ -65,8 +66,16 @@ class DevSection(Section):
         title=('{0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements)))
         ax.set_title(title)
+        xticks=np.linspace(0,self.args.width,3)
+        ax.set_xticks(xticks)
+        zticks=np.linspace(min(self.section_props.omega),
+                           max(self.section_props.omega),3)
+        ax.set_zticks(zticks)
         plt.show()
         return (fig,ax)
+
+    def get_k(self,nu: float=0.3):
+        return math.sqrt(self.get_j()/((2*(1+nu))*self.get_gamma()))
 
     def write_warping_csv(self,fn):
         x=self.mesh_nodes[:,0]
