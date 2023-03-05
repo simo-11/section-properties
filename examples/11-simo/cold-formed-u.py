@@ -65,17 +65,6 @@ def u_section(
 parser = argparse.ArgumentParser(description=
     ('Calculate section properties for cold-formed U-section.'),
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-W","--width", help="width",
-                    default=0.05,type=float)
-parser.add_argument("-H","--height", help="height",
-                    default=0.1,type=float)
-parser.add_argument("-T","--thickness", help="thickness",
-                    default=0.004,type=float)
-parser.add_argument("-R","--radius", help="""outer radius,
-if < thickness, 2*thickness is used""",
-                    default=0,type=float)
-parser.add_argument("--n_r", help="number of points in radius, 0 or >1",
-                    default=4,type=int)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 simo.dev.check_arguments(parser,args)

@@ -1,31 +1,56 @@
 r"""
 
-Rectangle
+Primirive
 --------------
 
-Calculate section properties of rectangle.
+Calculate section properties of
+ * rectangle(default) based on width(W) and height(H)
+ * circular based on diameter(D) and count(N)
 Mesh is refined until relative change of torsion and warping constants
 is not more than rtol unless mesh_size is given
 """
 import math
 import argparse
 import sectionproperties.pre.library.primitive_sections as sections
+import sectionproperties.pre.library.steel_sections as steel_sections
 #from sectionproperties.analysis.section import Section
 import simo.dev
+RECTANGLE='rectangle'
+CIRCULAR='circular'
+RHS='rhs'
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-W","--width", help="width of square",
-                    default=0.0032024,type=float)
-parser.add_argument("-H","--height", help="height of square",
-                    default=0.012377,type=float)
+parser.add_argument("--primitive", help="type of primitive",
+                    default=RECTANGLE,choices=[RECTANGLE,CIRCULAR,RHS])
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 simo.dev.check_arguments(parser,args)
-print("Rectangle: width = {0:.5g} and height = {1:.5g}".
-      format(args.width, args.height))
 bending=args.bending
 frame_analysis=args.frame_analysis
-geometry = sections.rectangular_section(args.width, args.height)
+if args.primitive==RECTANGLE:
+    print("{2}: width = {0:.5g} and height = {1:.5g}".
+      format(args.width, args.height,args.primitive))
+    geometry = sections.rectangular_section(args.width, args.height)
+elif args.primitive==RHS:
+    if args.n_r>0:
+        if args.radius<args.thickness:
+            args.radius=2*args.thickness
+        if args.n_r==1:
+           args.n_r=2
+    else:
+        args.radius=0
+    print("""{2}: width={0:.5g}, height={1:.5g},
+ thickness={3:.5g}, outer radius={4:.5g}, n_r={5}""".
+       format(args.width, args.height,args.primitive,args.thickness,
+              args.radius,args.n_r))
+    geometry = steel_sections.rectangular_hollow_section(args.width,
+        args.height,args.thickness,args.radius,args.n_r)
+elif args.primitive==CIRCULAR:
+    print("{2}: diameter = {0:.5g} and count = {1}".
+      format(args.diameter, args.count,args.primitive))
+    geometry = sections.circular_section(args.diameter, args.count)
+    args.width=args.diameter
+    args.height=args.diameter
 if args.plot_geometry:
     geometry.plot_geometry()
 a=geometry.calculate_area()
@@ -70,14 +95,14 @@ while simo.dev.run(args):
         if args.plot_warping_values:
             section.plot_warping_values()
         if args.write_warping_csv:
-            fn=("rectangle-{0:g}-{1:g}-{2}.csv".
+            fn=("{3}-{0:g}-{1:g}-{2}.csv".
                 format(1000*args.width,1000*args.height,
-                       len(section.section_props.omega)))
+                       len(section.section_props.omega),args.primitive))
             section.write_warping_csv(fn)
         if args.write_triangles_csv:
-            fn=("rectangle-tri-{0:g}-{1:g}-{2}.csv".
+            fn=("{3}-tri-{0:g}-{1:g}-{2}.csv".
                 format(1000*args.width,1000*args.height,
-                       len(section.section_props.omega)))
+                       len(section.section_props.omega),args.primitive))
             section.write_triangles_csv(fn)
     itDiff=abs((it-it0)/it0)
     if section.done(ms,itDiff,iwDiff):

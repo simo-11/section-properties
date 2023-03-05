@@ -10,17 +10,38 @@ Matlab has quite similar feature for matlab-scripts but uses
 
 @author: snikula
 """
-# %% initialize rectangle using normal run
+# %% rectangle
 import builtins
 builtins.runfile(
-    'C:/github/section-properties/examples/11-simo/rectangle.py',
-        args='--plot_warping_values -A -W 1 -H 4 --mesh_size=0.05')
-# %% initialize rectangle using debugger
+    'C:/github/section-properties/examples/11-simo/primitive.py',
+        args="""--plot_warping_values
+        -A -W 1 -H 1 --mesh_size=0.05
+        --primitive=rectangle
+        """)
+# %% circle
 import builtins
-builtins.debugfile(
-    'C:/github/section-properties/examples/11-simo/rectangle.py',
-        args='--plot_warping_values -A -W 1 -H 4 --mesh_size=0.05')
-# %%% torsion stress vector plot from upstream
+builtins.runfile(
+    'C:/github/section-properties/examples/11-simo/primitive.py',
+        args="""--plot_warping_values
+        -A --diameter 1 --mesh_size=0.05
+        --primitive=circular
+        """)
+# %% rhs
+import builtins
+builtins.runfile(
+    'C:/github/section-properties/examples/11-simo/primitive.py',
+        args="""--plot_warping_values
+        -A -W 1 -H 1 --thickness=0.1 --mesh_size=0.5
+        --primitive=rhs
+        """)
+# %% cold-formed-u
+import builtins
+builtins.runfile(
+    'C:/github/section-properties/examples/11-simo/cold-formed-u.py',
+        args="""--plot_warping_values
+        -A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5
+        """)
+# %% torsion stress plots from upstream
 """
 Note to myself, figure details on how warping function values (at nodes)
 are used with shape function derivates (at gauss integration points)
@@ -30,6 +51,8 @@ refers to usage of smoothing matrix.
 """
 stress_post = section.calculate_stress(Mzz=1e6)#noqa
 stress_post.plot_vector_mzz_zxy()
-# %%% warping
+stress_post.plot_stress_mzz_zxy()
+stress_post.plot_stress_mzz_zx()
+stress_post.plot_stress_mzz_zy()
+# %% warping
 section.plot_warping_values()#noqa
-# %%

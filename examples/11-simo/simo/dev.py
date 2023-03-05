@@ -66,7 +66,7 @@ class DevSection(Section):
         title=('{0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements)))
         ax.set_title(title)
-        xticks=np.linspace(0,self.args.width,3)
+        xticks=np.linspace(min(x),max(x),3)
         ax.set_xticks(xticks)
         zticks=np.linspace(min(self.section_props.omega),
                            max(self.section_props.omega),3)
@@ -147,6 +147,21 @@ def add_common_arguments(parser):
     parser.add_argument("--write_triangles_csv",
                         help="write triangles for each iteration",
                         action="store_true")
+    parser.add_argument("-W","--width", help="width",
+                        default=1,type=float)
+    parser.add_argument("-H","--height", help="height",
+                        default=1,type=float)
+    parser.add_argument("-T","--thickness", help="thickness",
+                        default=0.004,type=float)
+    parser.add_argument("-R","--radius", help="""outer radius,
+    if < thickness, 2*thickness is used""",
+                        default=0,type=float)
+    parser.add_argument("--n_r", help="number of points in radius, 0 or >1",
+                        default=4,type=int)
+    parser.add_argument("-D","--diameter", help="diameter",
+                        default=1,type=float)
+    parser.add_argument("-N","--count", help="count of points",
+                        default=32,type=float)
 
 def check_arguments(parser,args):
     if (not args.plot_section and not args.plot_geometry
