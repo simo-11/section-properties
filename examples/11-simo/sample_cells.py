@@ -50,9 +50,21 @@ https://sectionproperties.readthedocs.io/en/latest/rst/theory.html
 refers to usage of smoothing matrix.
 """
 stress_post = section.calculate_stress(Mzz=1e6)#noqa
-stress_post.plot_vector_mzz_zxy()
-stress_post.plot_stress_mzz_zxy()
-stress_post.plot_stress_mzz_zx()
-stress_post.plot_stress_mzz_zy()
-# %% warping
-section.plot_warping_values()#noqa
+ax_v=stress_post.plot_vector_mzz_zxy()
+ax_c_xy=stress_post.plot_stress_mzz_zxy()
+ax_c_x=stress_post.plot_stress_mzz_zx()
+ax_c_y=stress_post.plot_stress_mzz_zy()
+# %% vector plot with inset axes
+#(fig,ax)=section.plot_warping_values()#noqa
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+fig = plt.figure()
+ax=ax_v
+axins = zoomed_inset_axes(ax, zoom=0.5, loc='upper right')
+x1, x2, y1, y2 = -1.5, -0.9, -2.5, -1.9
+axins.set_xlim(x1, x2)
+axins.set_ylim(y1, y2)
+axins.set_xticklabels([])
+axins.set_yticklabels([])
+ax.indicate_inset_zoom(axins, edgecolor="black")
+plt.show()
