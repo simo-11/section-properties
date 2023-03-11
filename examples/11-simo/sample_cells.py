@@ -34,6 +34,14 @@ builtins.runfile(
         -A -W 1 -H 1 --thickness=0.1 --mesh_size=0.5
         --primitive=rhs
         """)
+# %% chs
+import builtins
+builtins.runfile(
+    'C:/github/section-properties/examples/11-simo/primitive.py',
+        args="""--plot_warping_values
+        -A --diameter 1 --mesh_size=0.2 --count=64
+        --primitive=chs --thickness 0.03
+        """)
 # %% cold-formed-u
 import builtins
 builtins.runfile(
@@ -59,13 +67,13 @@ ax_c_y=stress_post.plot_stress_mzz_zy()
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 fig = plt.figure()
-fig, ax = plt.subplots()
-ax.set_title('Inset axes')
+fig, ax1 = plt.subplots()
+ax1.set_title('Inset axes')
+fig.__dict__
+ax=ax_v
+plt.show()
+ax_v.draw()
 if False:
-    plt.show()
-    fig.__dict__
-    ax=ax_v
-    ax_v.draw()
     axins = zoomed_inset_axes(ax, zoom=0.5, loc='upper right')
     x1, x2, y1, y2 = -1.5, -0.9, -2.5, -1.9
     axins.set_xlim(x1, x2)

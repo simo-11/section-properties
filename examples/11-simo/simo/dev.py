@@ -161,7 +161,7 @@ def add_common_arguments(parser):
     parser.add_argument("-D","--diameter", help="diameter",
                         default=1,type=float)
     parser.add_argument("-N","--count", help="count of points",
-                        default=32,type=float)
+                        default=32,type=int)
 
 def check_arguments(parser,args):
     if (not args.plot_section and not args.plot_geometry

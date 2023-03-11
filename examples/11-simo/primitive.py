@@ -18,10 +18,11 @@ import simo.dev
 RECTANGLE='rectangle'
 CIRCULAR='circular'
 RHS='rhs'
+CHS='chs'
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("--primitive", help="type of primitive",
-                    default=RECTANGLE,choices=[RECTANGLE,CIRCULAR,RHS])
+                    default=RECTANGLE,choices=[RECTANGLE,CIRCULAR,RHS,CHS])
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 simo.dev.check_arguments(parser,args)
@@ -49,6 +50,14 @@ elif args.primitive==CIRCULAR:
     print("{2}: diameter = {0:.5g} and count = {1}".
       format(args.diameter, args.count,args.primitive))
     geometry = sections.circular_section(args.diameter, args.count)
+    args.width=args.diameter
+    args.height=args.diameter
+elif args.primitive==CHS:
+    print("""{2}: outer diameter={0:.5g},
+thickness={1:.5g} and count={3}""".
+       format(args.diameter, args.thickness, args.primitive, args.count))
+    geometry = steel_sections.circular_hollow_section(args.diameter,
+        args.thickness,args.count)
     args.width=args.diameter
     args.height=args.diameter
 if args.plot_geometry:
