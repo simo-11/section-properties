@@ -19,7 +19,7 @@ runfile('primitive.py',#noqa
 # %% rhs
 runfile('primitive.py',#noqa
   args="""-A -W 1 -H 1 --thickness=0.03 --mesh_size=0.05 --primitive=rhs
-  --radius=0.2 --n_r=8""")
+  --radius=0 --n_r=8""")
 # %% chs
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
@@ -27,8 +27,12 @@ runfile('primitive.py',#noqa
 # %% cold-formed-u
 runfile('cold-formed-u.py',#noqa
   args="""-A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5""")
+# %% plot_geometry
+section.geometry.plot_geometry()#noqa
 # %% plot_warping_values
 section.plot_warping_values()#noqa
+# %% contour_warping_values
+section.contour_warping_values(levels=51)#noqa
 # %% torsion stress plots from upstream
 """
 Note to myself, figure details on how warping function values (at nodes)

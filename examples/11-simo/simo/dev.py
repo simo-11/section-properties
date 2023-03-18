@@ -75,6 +75,21 @@ class DevSection(Section):
         plt.show()
         return (fig,ax)
 
+    def contour_warping_values(self, levels=9):
+        fig, ax = plt.subplots()
+        ax.set_box_aspect(self.args.height/self.args.width);
+        x=self.mesh_nodes[:,0]
+        y=self.mesh_nodes[:,1]
+        triangles=self.get_triangles()
+        z=self.section_props.omega
+        trictr = ax.tricontourf(x, y, triangles, z,levels=levels)
+        fig.colorbar(trictr, label="Warping", format="%.4g")
+        title=('{2}, {0} nodes, {1} elements'.format
+            (self.num_nodes,len(self.elements),self.args.title))
+        ax.set_title(title)
+        plt.show()
+        return (fig,ax)
+
     def get_k(self,nu: float=0.3):
         return math.sqrt(self.get_j()/((2*(1+nu))*self.get_gamma()))
 
