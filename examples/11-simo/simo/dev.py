@@ -48,6 +48,7 @@ class DevSection(Section):
 
     def set_args(self,args):
         self.args=args
+        print(self.args.title)
 
     def get_box_aspect(self):
         if self.args is None:
@@ -63,8 +64,8 @@ class DevSection(Section):
         z=self.section_props.omega
         triangles=self.get_triangles()
         ax.plot_trisurf(x, y,triangles, z)
-        title=('{0} nodes, {1} elements'.format
-            (self.num_nodes,len(self.elements)))
+        title=('{2}, {0} nodes, {1} elements'.format
+            (self.num_nodes,len(self.elements),self.args.title))
         ax.set_title(title)
         xticks=np.linspace(min(x),max(x),3)
         ax.set_xticks(xticks)
@@ -77,6 +78,12 @@ class DevSection(Section):
     def get_k(self,nu: float=0.3):
         return math.sqrt(self.get_j()/((2*(1+nu))*self.get_gamma()))
 
+    def gfn(self,fn):
+        """
+        Provides fn prefixed with value of gen-parameter
+        """
+        return(self.args.gen+'/'+fn)
+
     def write_warping_csv(self,fn):
         x=self.mesh_nodes[:,0]
         y=self.mesh_nodes[:,1]
@@ -85,7 +92,7 @@ class DevSection(Section):
         rows[:,0]=x
         rows[:,1]=y
         rows[:,2]=z
-        with open(fn, 'w', newline='') as csvfile:
+        with open(self.gfn(fn), 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['x','y','w'])
             writer.writerows(rows)
@@ -93,7 +100,7 @@ class DevSection(Section):
 
     def write_triangles_csv(self,fn):
         rows=self.get_triangles();
-        with open(fn, 'w', newline='') as csvfile:
+        with open(self.gfn(fn), 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['f','s','t'])
             writer.writerows(rows)
@@ -162,6 +169,10 @@ def add_common_arguments(parser):
                         default=1,type=float)
     parser.add_argument("-N","--count", help="count of points",
                         default=32,type=int)
+    parser.add_argument("--title")
+    parser.add_argument("--section_type")
+    parser.add_argument("--gen", help="""directory for generated files""",
+                        default="gen")
 
 def check_arguments(parser,args):
     if (not args.plot_section and not args.plot_geometry
@@ -171,3 +182,6 @@ def check_arguments(parser,args):
 
 def run(args):
     return (args.run_analysis or args.mesh_size or args.plot_warping_values)
+
+def version():
+    print(0.1)

@@ -67,6 +67,7 @@ parser = argparse.ArgumentParser(description=
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
+args.section_type='cold-formed-u'
 simo.dev.check_arguments(parser,args)
 if args.n_r>0:
     if args.radius<args.thickness:
@@ -75,10 +76,10 @@ if args.n_r>0:
        args.n_r=2
 else:
     args.radius=0
-print("""Cold-formed-U: width={0:.5g}, height={1:.5g},
+args.title=("""{5}: width={0:.5g}, height={1:.5g},
 thickness={2:.5g}, outer radius={3:.5g}, n_r={4}""".
       format(args.width, args.height,args.thickness,
-             args.radius,args.n_r))
+             args.radius,args.n_r,args.section_type))
 bending=args.bending
 frame_analysis=args.frame_analysis
 geometry = u_section(args.height, args.width,
@@ -110,7 +111,7 @@ if args.plot_section:
                       xytext=(0.25*args.width,0.25*args.height),
                       arrowprops=dict(arrowstyle='->')
                       )
-    fn='USection-{0:g}x{1:g}x{2:g}.pdf'.format(*tuple([f * 1000 for f in
+    fn='gen/USection-{0:g}x{1:g}x{2:g}.pdf'.format(*tuple([f * 1000 for f in
                        (args.height,args.width,args.thickness)]));
     plt.tight_layout()
     plt.savefig(fn);

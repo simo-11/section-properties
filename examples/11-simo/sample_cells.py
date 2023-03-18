@@ -11,44 +11,24 @@ Matlab has quite similar feature for matlab-scripts but uses
 @author: snikula
 """
 # %% rectangle
-import builtins
-builtins.runfile(
-    'C:/github/section-properties/examples/11-simo/primitive.py',
-        args="""--plot_warping_values
-        -A -W 1 -H 1 --mesh_size=0.05
-        --primitive=rectangle
-        """)
+runfile('primitive.py',#noqa
+  args="""-A -W 1 -H 1 --mesh_size=0.05 --primitive=rectangle""")
 # %% circle
-import builtins
-builtins.runfile(
-    'C:/github/section-properties/examples/11-simo/primitive.py',
-        args="""--plot_warping_values
-        -A --diameter 1 --mesh_size=0.05
-        --primitive=circular
-        """)
+runfile('primitive.py',#noqa
+  args="""-A --diameter 1 --mesh_size=0.05 --primitive=circular""")
 # %% rhs
-import builtins
-builtins.runfile(
-    'C:/github/section-properties/examples/11-simo/primitive.py',
-        args="""--plot_warping_values
-        -A -W 1 -H 1 --thickness=0.1 --mesh_size=0.5
-        --primitive=rhs
-        """)
+runfile('primitive.py',#noqa
+  args="""-A -W 1 -H 1 --thickness=0.03 --mesh_size=0.05 --primitive=rhs
+  --radius=0.2 --n_r=8""")
 # %% chs
-import builtins
-builtins.runfile(
-    'C:/github/section-properties/examples/11-simo/primitive.py',
-        args="""--plot_warping_values
-        -A --diameter 1 --mesh_size=0.2 --count=64
-        --primitive=chs --thickness 0.03
-        """)
+runfile('primitive.py',#noqa
+  args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
+   --count=64""")
 # %% cold-formed-u
-import builtins
-builtins.runfile(
-    'C:/github/section-properties/examples/11-simo/cold-formed-u.py',
-        args="""--plot_warping_values
-        -A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5
-        """)
+runfile('cold-formed-u.py',#noqa
+  args="""-A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5""")
+# %% plot_warping_values
+section.plot_warping_values()#noqa
 # %% torsion stress plots from upstream
 """
 Note to myself, figure details on how warping function values (at nodes)
@@ -59,9 +39,9 @@ refers to usage of smoothing matrix.
 """
 stress_post = section.calculate_stress(Mzz=1e6)#noqa
 ax_v=stress_post.plot_vector_mzz_zxy()
-ax_c_xy=stress_post.plot_stress_mzz_zxy()
-ax_c_x=stress_post.plot_stress_mzz_zx()
-ax_c_y=stress_post.plot_stress_mzz_zy()
+ax_c_xy=stress_post.plot_stress_mzz_zxy(normalize=False)
+#ax_c_x=stress_post.plot_stress_mzz_zx()
+#ax_c_y=stress_post.plot_stress_mzz_zy()
 # %% inset axes
 #(fig,ax)=section.plot_warping_values()#noqa
 import matplotlib.pyplot as plt

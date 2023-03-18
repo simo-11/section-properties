@@ -29,7 +29,7 @@ simo.dev.check_arguments(parser,args)
 bending=args.bending
 frame_analysis=args.frame_analysis
 if args.primitive==RECTANGLE:
-    print("{2}: width = {0:.5g} and height = {1:.5g}".
+    args.title=("{2}: width = {0:.5g} and height = {1:.5g}".
       format(args.width, args.height,args.primitive))
     geometry = sections.rectangular_section(args.width, args.height)
 elif args.primitive==RHS:
@@ -40,20 +40,20 @@ elif args.primitive==RHS:
            args.n_r=2
     else:
         args.radius=0
-    print("""{2}: width={0:.5g}, height={1:.5g},
+    args.title=("""{2}: width={0:.5g}, height={1:.5g},
  thickness={3:.5g}, outer radius={4:.5g}, n_r={5}""".
        format(args.width, args.height,args.primitive,args.thickness,
               args.radius,args.n_r))
     geometry = steel_sections.rectangular_hollow_section(args.width,
         args.height,args.thickness,args.radius,args.n_r)
 elif args.primitive==CIRCULAR:
-    print("{2}: diameter = {0:.5g} and count = {1}".
+    args.title=("{2}: diameter = {0:.5g} and count = {1}".
       format(args.diameter, args.count,args.primitive))
     geometry = sections.circular_section(args.diameter, args.count)
     args.width=args.diameter
     args.height=args.diameter
 elif args.primitive==CHS:
-    print("""{2}: outer diameter={0:.5g},
+    args.title=("""{2}: outer diameter={0:.5g},
 thickness={1:.5g} and count={3}""".
        format(args.diameter, args.thickness, args.primitive, args.count))
     geometry = steel_sections.circular_hollow_section(args.diameter,
