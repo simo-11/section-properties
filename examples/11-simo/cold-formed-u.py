@@ -67,7 +67,7 @@ parser = argparse.ArgumentParser(description=
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
-args.section_type='cold-formed-u'
+args.primitive='cold-formed-u'
 simo.dev.check_arguments(parser,args)
 if args.n_r>0:
     if args.radius<args.thickness:

@@ -72,12 +72,11 @@ class DevSection(Section):
         zticks=np.linspace(min(self.section_props.omega),
                            max(self.section_props.omega),3)
         ax.set_zticks(zticks)
-        plt.show()
         return (fig,ax)
 
     def contour_warping_values(self, levels=9):
         fig, ax = plt.subplots()
-        ax.set_box_aspect(self.args.height/self.args.width);
+        self.set_box_aspect(ax)
         x=self.mesh_nodes[:,0]
         y=self.mesh_nodes[:,1]
         triangles=self.get_triangles()
@@ -87,8 +86,10 @@ class DevSection(Section):
         title=('{2}, {0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements),self.args.title))
         ax.set_title(title)
-        plt.show()
         return (fig,ax)
+
+    def set_box_aspect(self,ax):
+        ax.set_box_aspect(self.args.height/self.args.width);
 
     def get_k(self,nu: float=0.3):
         return math.sqrt(self.get_j()/((2*(1+nu))*self.get_gamma()))
@@ -132,6 +133,10 @@ class DevSection(Section):
                       self.num_nodes,len(self.elements)))
         return self.args.mesh_size or (
             itDiff<self.args.rtol and iwDiff<self.args.rtol)
+
+    def is_shs(self):
+        return (self.args.primitive=='rhs'
+                and self.args.width==self.args.height)
 
 def add_common_arguments(parser):
     parser.add_argument("--rtol", help="relative tolerance",

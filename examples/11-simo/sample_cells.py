@@ -46,23 +46,35 @@ ax_v=stress_post.plot_vector_mzz_zxy()
 ax_c_xy=stress_post.plot_stress_mzz_zxy(normalize=False)
 #ax_c_x=stress_post.plot_stress_mzz_zx()
 #ax_c_y=stress_post.plot_stress_mzz_zy()
-# %% inset axes
-#(fig,ax)=section.plot_warping_values()#noqa
+# %% inset axes for contour_warping_values
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-fig = plt.figure()
-fig, ax1 = plt.subplots()
-ax1.set_title('Inset axes')
-fig.__dict__
-ax=ax_v
+levels=51
+fn=None
+title=None
+s=section#noqa
+w=s.args.width#noqa
+h=s.args.height#noqa
+if s.is_shs():#noqa
+    fn='warping-of-shs.pdf'
+    title='Warping distribution of SHS using section properties'
+(fig,ax)=s.contour_warping_values(levels=levels)#noqa
+if title:
+    ax.set_title(title)
+axins = ax.inset_axes([0.1, 0.1, 0.7, 0.7])
+s.set_box_aspect(axins)
+x=s.mesh_nodes[:,0]
+y=s.mesh_nodes[:,1]
+triangles=s.get_triangles()#noqa
+z=s.section_props.omega#noqa
+trictr = axins.tricontourf(x, y, triangles, z,levels=levels)
+# subregion of the original image
+x1, x2, y1, y2 = 0.92*w, 1.0*w, 0.92*h, 1.0*h
+axins.set_xlim(x1, x2)
+axins.set_ylim(y1, y2)
+axins.set_xticklabels([])
+axins.set_yticklabels([])
+ax.indicate_inset_zoom(axins, edgecolor="black")
+if fn!=None:
+    plt.savefig(fn)
+    print('Wrote {0}'.format(fn))
 plt.show()
-ax_v.draw()
-if False:
-    axins = zoomed_inset_axes(ax, zoom=0.5, loc='upper right')
-    x1, x2, y1, y2 = -1.5, -0.9, -2.5, -1.9
-    axins.set_xlim(x1, x2)
-    axins.set_ylim(y1, y2)
-    axins.set_xticklabels([])
-    axins.set_yticklabels([])
-    ax.indicate_inset_zoom(axins, edgecolor="black")
-    plt.show()
