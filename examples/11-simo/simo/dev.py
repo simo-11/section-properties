@@ -46,6 +46,18 @@ class DevSection(Section):
             self.triangles=triangles
         return self.triangles
 
+    def find_element(self,x1,x2,y1,y2):
+        for el in self.elements:
+            for i in range(0,3):
+                x=el.coords[0][i]
+                if x<x1 or x>x2:
+                    break
+                y=el.coords[1][i]
+                if y<y1 or y>y2:
+                    break
+                return el
+        return None
+
     def set_args(self,args):
         self.args=args
         print(self.args.title)

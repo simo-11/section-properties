@@ -29,6 +29,32 @@ runfile('cold-formed-u.py',#noqa
   args="""-A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5""")
 # %% plot_geometry
 section.geometry.plot_geometry()#noqa
+# %% plot_mesh
+import matplotlib.pyplot as plt
+s=section#noqa
+w=s.args.width
+h=s.args.height
+alpha=0.5
+mask=None
+x=s.mesh_nodes[:,0]
+y=s.mesh_nodes[:,1]
+t=s.mesh_elements[:, 0:3]
+fig, ax = plt.subplots()
+s.set_box_aspect(ax)
+ax.triplot(x,y,t,lw=0.5,color="black",alpha=alpha,mask=mask)
+axins = ax.inset_axes([0.1, 0.1, 0.7, 0.7])
+s.set_box_aspect(axins)
+axins.triplot(x,y,t,lw=0.5,color="black",alpha=alpha,mask=mask)
+# subregion of the original image
+x1, x2, y1, y2 = -0.1*w, 0.05*w, 0.36*h, 0.51*h
+el=s.find_element(x1,x2,y1,y2)
+print(el)
+axins.set_xlim(x1, x2)
+axins.set_ylim(y1, y2)
+axins.set_xticklabels([])
+axins.set_yticklabels([])
+ax.indicate_inset_zoom(axins, edgecolor="black")
+plt.show()
 # %% plot_warping_values
 section.plot_warping_values()#noqa
 # %% contour_warping_values
@@ -40,12 +66,27 @@ are used with shape function derivates (at gauss integration points)
 to get correct shear stresses.
 https://sectionproperties.readthedocs.io/en/latest/rst/theory.html
 refers to usage of smoothing matrix.
+fea.py:element_stress
+              sig_zxy_mzz_gp[i, :] = (
+                  self.material.elastic_modulus
+                  * Mzz
+                  / j
+                  * (B.dot(omega) - np.array([Ny, -Nx]))
+
 """
 stress_post = section.calculate_stress(Mzz=1e6)#noqa
-ax_v=stress_post.plot_vector_mzz_zxy()
+#ax_v=stress_post.plot_vector_mzz_zxy()
 ax_c_xy=stress_post.plot_stress_mzz_zxy(normalize=False)
 #ax_c_x=stress_post.plot_stress_mzz_zx()
 #ax_c_y=stress_post.plot_stress_mzz_zy()
+# %% analytic for circular, diameter=1 -> 5.09 MPa
+import math
+d=1
+r=d/2
+Mzz=1e6
+It=math.pi*math.pow(d,4)/32
+tau=Mzz/It*r
+print("d={0}, It={1:.3g}, Mzz={2:.3g}, tau={3:.3g}".format(d,It,Mzz,tau))
 # %% inset axes for contour_warping_values
 import matplotlib.pyplot as plt
 levels=51
