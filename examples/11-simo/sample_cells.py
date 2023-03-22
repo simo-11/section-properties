@@ -23,7 +23,7 @@ runfile('primitive.py',#noqa
 # %% chs
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
-   --count=64""")
+   --count=128""")
 # %% cold-formed-u
 runfile('cold-formed-u.py',#noqa
   args="""-A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5""")
@@ -47,8 +47,8 @@ s.set_box_aspect(axins)
 axins.triplot(x,y,t,lw=0.5,color="black",alpha=alpha,mask=mask)
 # subregion of the original image
 x1, x2, y1, y2 = -0.1*w, 0.05*w, 0.36*h, 0.51*h
-el=s.find_element(x1,x2,y1,y2)
-print(el)
+els=s.find_elements_in_region(x1,x2,y1,y2)
+print(els)
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
 axins.set_xticklabels([])
@@ -79,12 +79,25 @@ stress_post = section.calculate_stress(Mzz=1e6)#noqa
 ax_c_xy=stress_post.plot_stress_mzz_zxy(normalize=False)
 #ax_c_x=stress_post.plot_stress_mzz_zx()
 #ax_c_y=stress_post.plot_stress_mzz_zy()
-# %% analytic for circular, diameter=1 -> 5.09 MPa
+# %% analytic for circular, diameter=1: 5.09 MPa
+# section-properties: 5.16 MPa (+ 1 %)
 import math
 d=1
 r=d/2
 Mzz=1e6
 It=math.pi*math.pow(d,4)/32
+tau=Mzz/It*r
+print("d={0}, It={1:.3g}, Mzz={2:.3g}, tau={3:.3g}".format(d,It,Mzz,tau))
+# %% analytic for chs, outer diameter=1, t=0.03: 214 MPa
+# section-properties(n=32): 241 MPa (+ 12 %)
+# section-properties(n=64): 233 MPa (+ 8 %)
+import math
+d=1
+t=0.003
+d2=d-2*t
+r=d/2
+Mzz=1e6
+It=math.pi*(math.pow(d,4)-math.pow(d2,4))/32
 tau=Mzz/It*r
 print("d={0}, It={1:.3g}, Mzz={2:.3g}, tau={3:.3g}".format(d,It,Mzz,tau))
 # %% inset axes for contour_warping_values
@@ -109,7 +122,10 @@ triangles=s.get_triangles()#noqa
 z=s.section_props.omega#noqa
 trictr = axins.tricontourf(x, y, triangles, z,levels=levels)
 # subregion of the original image
-x1, x2, y1, y2 = 0.92*w, 1.0*w, 0.92*h, 1.0*h
+if s.args.primitive in ['circular','chs']:
+    x1, x2, y1, y2 = -0.1*w, 0.05*w, 0.36*h, 0.51*h
+else:
+     x1, x2, y1, y2 = 0.92*w, 1.0*w, 0.92*h, 1.0*h
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
 axins.set_xticklabels([])
