@@ -20,13 +20,17 @@ runfile('primitive.py',#noqa
 runfile('primitive.py',#noqa
   args="""-A -W 1 -H 1 --thickness=0.03 --mesh_size=0.05 --primitive=rhs
   --radius=0 --n_r=8""")
+# %% Timo's rhs
+# On the distortion and warping of cantilever beams with hollow section
+runfile('primitive.py',#noqa
+  args="""-A -W 0.1 -H 0.1 --thickness=0.03 --primitive=rhs --n_r=0""")
 # %% chs
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
    --count=128""")
 # %% cold-formed-u
 runfile('cold-formed-u.py',#noqa
-  args="""-A -W 1 -H 2 --thickness=0.1 --mesh_size=0.5""")
+  args="""-A -W 1 -H 2 --thickness=0.01 --mesh_size=0.5""")
 # %% plot_geometry
 section.geometry.plot_geometry()#noqa
 # %% plot_mesh
@@ -91,6 +95,7 @@ print("d={0}, It={1:.3g}, Mzz={2:.3g}, tau={3:.3g}".format(d,It,Mzz,tau))
 # %% analytic for chs, outer diameter=1, t=0.03: 214 MPa
 # section-properties(n=32): 241 MPa (+ 12 %)
 # section-properties(n=64): 233 MPa (+ 8 %)
+# section-properties(n=128): 232 MPa (+ 8 %)
 import math
 d=1
 t=0.003

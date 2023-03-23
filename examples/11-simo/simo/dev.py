@@ -63,9 +63,10 @@ class DevSection(Section):
                 els.append(el)
         return els
 
-    def set_args(self,args):
+    def set_args(self,args,it_num):
         self.args=args
-        print(self.args.title)
+        if it_num==1:
+            print(self.args.title)
 
     def get_box_aspect(self):
         if self.args is None:
@@ -219,6 +220,3 @@ def check_arguments(parser,args):
 
 def run(args):
     return (args.run_analysis or args.mesh_size or args.plot_warping_values)
-
-def version():
-    print(0.1)
