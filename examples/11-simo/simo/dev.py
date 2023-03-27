@@ -6,6 +6,7 @@ Created on Wed Jul 27 16:36:57 2022
 """
 #import argparse
 from sectionproperties.analysis.section import Section
+from pygltflib import GLTF2
 import numpy as np
 import csv
 import math
@@ -24,7 +25,7 @@ class DevSection(Section):
             ne=len(ma)
             nt=4*ne
             ti=0
-            triangles=np.empty([nt, 3],dtype=int)
+            triangles=np.empty([nt, 3],dtype='uint16')
             for i in range(0,ne):
                 me=ma[i]
                 triangles[ti,0]=me[0]

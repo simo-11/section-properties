@@ -63,6 +63,96 @@ plt.show()
 section.plot_warping_values()#noqa
 # %% contour_warping_values
 section.contour_warping_values(levels=51)#noqa
+# %% write_warping_gltf
+import pygltflib
+import numpy as np
+def write_warping_gltf(self,fn=None):
+    if fn==None:
+        fn=self.args.title+'.glb'
+    ps=len(self.mesh_nodes)
+    points=np.empty((ps,3),dtype="float32")
+    points[:,0]=self.mesh_nodes[:,0]
+    points[:,1]=self.mesh_nodes[:,1]
+    points[:,2]=self.section_props.omega
+    triangles=self.get_triangles()
+    triangles_binary_blob = triangles.flatten().tobytes()
+    points_binary_blob = points.tobytes()
+    r=0.2
+    g=0.2
+    b=0.2
+    a=0.85
+    gltf = pygltflib.GLTF2(
+    scene=0,
+    scenes=[pygltflib.Scene(nodes=[0])],
+    nodes=[pygltflib.Node(mesh=0)],
+    meshes=[
+        pygltflib.Mesh(
+            primitives=[
+                pygltflib.Primitive(
+                    attributes=pygltflib.Attributes(POSITION=1),
+                    indices=0,
+                    material=0
+                )
+            ]
+        )
+    ],
+    materials=[
+        pygltflib.Material(pbrMetallicRoughness=
+                           pygltflib.PbrMetallicRoughness(
+                               baseColorFactor=[r,g,b,a]),
+                           doubleSided=True,
+                           alphaMode='BLEND')
+    ],
+    accessors=[
+        pygltflib.Accessor(
+            bufferView=0,
+            componentType=pygltflib.UNSIGNED_SHORT,
+            count=triangles.size,
+            type=pygltflib.SCALAR,
+            max=[int(triangles.max())],
+            min=[int(triangles.min())],
+        ),
+        pygltflib.Accessor(
+            bufferView=1,
+            componentType=pygltflib.FLOAT,
+            count=len(points),
+            type=pygltflib.VEC3,
+            max=points.max(axis=0).tolist(),
+            min=points.min(axis=0).tolist(),
+        ),
+    ],
+    bufferViews=[
+        pygltflib.BufferView(
+            buffer=0,
+            byteLength=len(triangles_binary_blob),
+            target=pygltflib.ELEMENT_ARRAY_BUFFER,
+        ),
+        pygltflib.BufferView(
+            buffer=0,
+            byteOffset=len(triangles_binary_blob),
+            byteLength=len(points_binary_blob),
+            target=pygltflib.ARRAY_BUFFER,
+        ),
+    ],
+    buffers=[
+        pygltflib.Buffer(
+            byteLength=len(triangles_binary_blob) + len(points_binary_blob)
+        )
+    ],
+    )
+    gltf.set_binary_blob(triangles_binary_blob + points_binary_blob)
+    animations=[
+        pygltflib.Animation(name="Animate warping",
+                            channels=[pygltflib.AnimationChannel(
+                                sampler=pygltflib.AnimationSampler(
+                                    ))],
+                            samplers=[pygltflib.AnimationSampler(
+                                )]),
+    ]
+    gfn=self.gfn(fn)
+    gltf.save(gfn)
+s=section#noqa
+write_warping_gltf(s,'ws.glb')
 # %% torsion stress plots from upstream
 """
 Note to myself, figure details on how warping function values (at nodes)
