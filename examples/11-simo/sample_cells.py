@@ -12,7 +12,7 @@ Matlab has quite similar feature for matlab-scripts but uses
 """
 # %% rectangle
 runfile('primitive.py',#noqa
-  args="""-A -W 1 -H 1 --mesh_size=0.05 --primitive=rectangle""")
+  args="""-A -W 1 -H 1 --mesh_size=0.01 --primitive=rectangle""")
 # %% circle
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --mesh_size=0.05 --primitive=circular""")
@@ -23,14 +23,14 @@ runfile('primitive.py',#noqa
 # %% Timo's rhs
 # On the distortion and warping of cantilever beams with hollow section
 runfile('primitive.py',#noqa
-  args="""-A -W 0.1 -H 0.1 --thickness=0.03 --primitive=rhs --n_r=0""")
+  args="""-A -W 0.1 -H 0.1 --thickness=0.003 --primitive=rhs --n_r=0""")
 # %% chs
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
    --count=128""")
 # %% cold-formed-u
 runfile('cold-formed-u.py',#noqa
-  args="""-A -W 1 -H 2 --thickness=0.01 --mesh_size=0.5""")
+  args="""-A -W 1 -H 2 --thickness=0.08 --mesh_size=0.5""")
 # %% plot_geometry
 section.geometry.plot_geometry()#noqa
 # %% plot_mesh
@@ -77,6 +77,16 @@ def write_warping_gltf(self,fn=None):
     triangles=self.get_triangles()
     triangles_binary_blob = triangles.flatten().tobytes()
     points_binary_blob = points.tobytes()
+    n_times=51
+    d=n_times-1
+    times=np.empty(n_times,dtype="float32")
+    scales=np.ones((n_times,3),dtype="float32")
+    scaler=0.1*self.get_box_aspect()[2]/max(self.section_props.omega)
+    for i in range(0,n_times):
+        times[i]=i
+        scales[i,2]=math.sin(times[i]/d*2*math.pi)*scaler
+    times_blob=times.tobytes();
+    scales_blob=scales.tobytes();
     r=0.2
     g=0.2
     b=0.2
@@ -101,6 +111,7 @@ def write_warping_gltf(self,fn=None):
                            pygltflib.PbrMetallicRoughness(
                                baseColorFactor=[r,g,b,a]),
                            doubleSided=True,
+                           alphaCutoff=None,
                            alphaMode='BLEND')
     ],
     accessors=[
@@ -120,35 +131,74 @@ def write_warping_gltf(self,fn=None):
             max=points.max(axis=0).tolist(),
             min=points.min(axis=0).tolist(),
         ),
+        pygltflib.Accessor(
+            bufferView=2,
+            componentType=pygltflib.FLOAT,
+            count=n_times,
+            type=pygltflib.SCALAR,
+            max=[times.max().item()],
+            min=[0],
+        ),
+        pygltflib.Accessor(
+            bufferView=3,
+            componentType=pygltflib.FLOAT,
+            count=n_times,
+            type=pygltflib.VEC3,
+            max=scales.max(axis=0).tolist(),
+            min=scales.min(axis=0).tolist(),
+        ),
     ],
     bufferViews=[
         pygltflib.BufferView(
             buffer=0,
             byteLength=len(triangles_binary_blob),
             target=pygltflib.ELEMENT_ARRAY_BUFFER,
+            name='triangles',
         ),
         pygltflib.BufferView(
             buffer=0,
-            byteOffset=len(triangles_binary_blob),
             byteLength=len(points_binary_blob),
+            byteOffset=len(triangles_binary_blob),
             target=pygltflib.ARRAY_BUFFER,
+            name='points',
+        ),
+        pygltflib.BufferView(
+            buffer=0,
+            byteLength=len(times_blob),
+            byteOffset=len(triangles_binary_blob)+
+                len(points_binary_blob),
+            name='times',
+        ),
+        pygltflib.BufferView(
+            buffer=0,
+            byteLength=len(scales_blob),
+            byteOffset=len(triangles_binary_blob)+
+                len(points_binary_blob)+
+                len(times_blob),
+            name='scales',
         ),
     ],
     buffers=[
-        pygltflib.Buffer(
-            byteLength=len(triangles_binary_blob) + len(points_binary_blob)
-        )
+        pygltflib.Buffer(byteLength=len(triangles_binary_blob)+
+                         len(points_binary_blob)+
+                         len(times_blob)+
+                         len(scales_blob))
     ],
-    )
-    gltf.set_binary_blob(triangles_binary_blob + points_binary_blob)
     animations=[
-        pygltflib.Animation(name="Animate warping",
+        pygltflib.Animation(name="Warping",
                             channels=[pygltflib.AnimationChannel(
-                                sampler=pygltflib.AnimationSampler(
-                                    ))],
+                                sampler=0,
+                                target=pygltflib.AnimationChannelTarget(
+                                    node=0,path='scale')
+                                )],
                             samplers=[pygltflib.AnimationSampler(
-                                )]),
+                                input=2,output=3)]),
     ]
+    )
+    gltf.set_binary_blob(triangles_binary_blob + points_binary_blob+
+                         times_blob+scales_blob)
+    #
+    #
     gfn=self.gfn(fn)
     gltf.save(gfn)
 s=section#noqa

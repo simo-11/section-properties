@@ -185,8 +185,8 @@ def add_common_arguments(parser):
                         help="plot warping values for each iteration",
                         action="store_true")
     parser.add_argument("--z_scale",
-                        help="scaling of z in plot_warping_values",
-                        default=0.5,type=float)
+        help="scaling of z in plot_warping_values and write_warping_gltf",
+        default=0.5,type=float)
     parser.add_argument("--write_warping_csv",
                         help="write warping values for each iteration",
                         action="store_true")

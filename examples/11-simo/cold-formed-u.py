@@ -124,6 +124,7 @@ it0=a
 iw0=a
 ms=math.pow(6*args.thickness,2)
 vertices0=0 # sometimes requesting smaller mesh size generates same mesh
+it_num=0
 while simo.dev.run(args):
     ms=0.82*ms
     if args.mesh_size:
@@ -133,8 +134,9 @@ while simo.dev.run(args):
     if vertices0==vertices:
         continue
     vertices0=vertices
+    it_num=it_num+1
     section = simo.dev.DevSection(geometry)
-    section.set_args(args)
+    section.set_args(args,it_num)
     if args.plot_mesh:
         section.plot_mesh()
     section.calculate_geometric_properties()
