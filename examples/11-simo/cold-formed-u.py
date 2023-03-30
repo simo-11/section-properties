@@ -67,7 +67,7 @@ parser = argparse.ArgumentParser(description=
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
-args.primitive='cold-formed-u'
+args.primitive=simo.dev.COLD_FORMED_U
 simo.dev.check_arguments(parser,args)
 if args.n_r>0:
     if args.radius<args.thickness:
@@ -165,17 +165,9 @@ while simo.dev.run(args):
         if args.plot_warping_values:
             section.plot_warping_values()
         if args.write_warping_csv:
-            fn='USection-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
-                 *tuple([f * 1000 for f in
-                    (args.height,args.width,args.thickness,args.radius)]),
-                 args.n_r,len(section.section_props.omega));
-            section.write_warping_csv(fn)
+            section.write_warping_csv()
         if args.write_triangles_csv:
-            fn='USection-tri-{0:g}x{1:g}x{2:g}-{3:g}-{4:g}-{5}.csv'.format(
-                 *tuple([f * 1000 for f in
-                    (args.height,args.width,args.thickness,args.radius)]),
-                 args.n_r,len(section.section_props.omega));
-            section.write_triangles_csv(fn)
+            section.write_triangles_csv()
     itDiff=abs((it-it0)/it0)
     if section.done(ms,itDiff,iwDiff):
         break

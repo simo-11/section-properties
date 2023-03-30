@@ -6,12 +6,18 @@ Created on Wed Jul 27 16:36:57 2022
 """
 #import argparse
 from sectionproperties.analysis.section import Section
-from pygltflib import GLTF2
+import pygltflib
 import numpy as np
 import csv
 import math
 import matplotlib.pyplot as plt
 
+RECTANGLE='rectangle'
+CIRCULAR='circular'
+RHS='rhs'
+CHS='chs'
+PRIMITIVE_CHOICES=[RECTANGLE,CIRCULAR,RHS,CHS]
+COLD_FORMED_U='cold-formed-u'
 class DevSection(Section):
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -119,7 +125,175 @@ class DevSection(Section):
         """
         return(self.args.gen+'/'+fn)
 
+    def default_filename(self,suffix,use_case):
+        words=[use_case]
+        words.append(self.args.primitive)
+        if self.uses_diameter():
+            words.append("{0:g}-{1}".format(
+                1000*self.args.diameter,self.args.count))
+        else:
+            words.append("{0:g}-{1:g}".format
+                         (1000*self.args.height,1000*self.args.width))
+        if self.uses_t():
+            words.append("{0:g}".format(1000*self.args.thickness))
+        if self.uses_r():
+            words.append("{0:g}".format(1000*self.args.radius))
+        if self.uses_n_r():
+            words.append("{0}".format(self.args.n_r))
+        words.append('{0}'.format(len(self.section_props.omega)))
+        return '-'.join(words)+suffix
+
+    def uses_diameter(self):
+        return self.args.primitive in (CIRCULAR,CHS)
+
+    def uses_t(self):
+        return self.args.primitive in (RHS,CHS,COLD_FORMED_U)
+
+    def uses_r(self):
+        return self.args.primitive in (RHS,COLD_FORMED_U)
+
+    def uses_n_r(self):
+        return self.args.primitive in (RHS,COLD_FORMED_U)
+
+    def write_warping_gltf(self,fn=None):
+        if fn==None:
+            fn=self.default_filename(suffix='.glb',use_case='warping')
+        ps=len(self.mesh_nodes)
+        points=np.empty((ps,3),dtype="float32")
+        points[:,0]=self.mesh_nodes[:,0]
+        points[:,1]=self.mesh_nodes[:,1]
+        points[:,2]=self.section_props.omega
+        triangles=self.get_triangles()
+        triangles_binary_blob = triangles.flatten().tobytes()
+        points_binary_blob = points.tobytes()
+        n_times=31
+        d=n_times-1
+        times=np.empty(n_times,dtype="float32")
+        scales=np.ones((n_times,3),dtype="float32")
+        scaler=0.4*self.get_box_aspect()[2]/max(self.section_props.omega)
+        for i in range(0,n_times):
+            times[i]=i
+            scales[i,2]=math.sin(times[i]/d*2*math.pi)*scaler
+        times_blob=times.tobytes();
+        scales_blob=scales.tobytes();
+        r=0.2
+        g=0.2
+        b=0.2
+        a=0.85
+        gltf = pygltflib.GLTF2(
+        scene=0,
+        scenes=[pygltflib.Scene(nodes=[0])],
+        nodes=[pygltflib.Node(mesh=0)],
+        meshes=[
+            pygltflib.Mesh(
+                primitives=[
+                    pygltflib.Primitive(
+                        attributes=pygltflib.Attributes(POSITION=1),
+                        indices=0,
+                        material=0
+                    )
+                ]
+            )
+        ],
+        materials=[
+            pygltflib.Material(pbrMetallicRoughness=
+                               pygltflib.PbrMetallicRoughness(
+                                   baseColorFactor=[r,g,b,a]),
+                               doubleSided=True,
+                               alphaCutoff=None,
+                               alphaMode='BLEND')
+        ],
+        accessors=[
+            pygltflib.Accessor(
+                bufferView=0,
+                componentType=pygltflib.UNSIGNED_SHORT,
+                count=triangles.size,
+                type=pygltflib.SCALAR,
+                max=[int(triangles.max())],
+                min=[int(triangles.min())],
+            ),
+            pygltflib.Accessor(
+                bufferView=1,
+                componentType=pygltflib.FLOAT,
+                count=len(points),
+                type=pygltflib.VEC3,
+                max=points.max(axis=0).tolist(),
+                min=points.min(axis=0).tolist(),
+            ),
+            pygltflib.Accessor(
+                bufferView=2,
+                componentType=pygltflib.FLOAT,
+                count=n_times,
+                type=pygltflib.SCALAR,
+                max=[times.max().item()],
+                min=[0],
+            ),
+            pygltflib.Accessor(
+                bufferView=3,
+                componentType=pygltflib.FLOAT,
+                count=n_times,
+                type=pygltflib.VEC3,
+                max=scales.max(axis=0).tolist(),
+                min=scales.min(axis=0).tolist(),
+            ),
+        ],
+        bufferViews=[
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(triangles_binary_blob),
+                target=pygltflib.ELEMENT_ARRAY_BUFFER,
+                name='triangles',
+            ),
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(points_binary_blob),
+                byteOffset=len(triangles_binary_blob),
+                target=pygltflib.ARRAY_BUFFER,
+                name='points',
+            ),
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(times_blob),
+                byteOffset=len(triangles_binary_blob)+
+                    len(points_binary_blob),
+                name='times',
+            ),
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(scales_blob),
+                byteOffset=len(triangles_binary_blob)+
+                    len(points_binary_blob)+
+                    len(times_blob),
+                name='scales',
+            ),
+        ],
+        buffers=[
+            pygltflib.Buffer(byteLength=len(triangles_binary_blob)+
+                             len(points_binary_blob)+
+                             len(times_blob)+
+                             len(scales_blob))
+        ],
+        animations=[
+            pygltflib.Animation(name="warping",
+                                channels=[pygltflib.AnimationChannel(
+                                    sampler=0,
+                                    target=pygltflib.AnimationChannelTarget(
+                                        node=0,path='scale')
+                                    )],
+                                samplers=[pygltflib.AnimationSampler(
+                                    input=2,output=3)]),
+        ]
+        )
+        gltf.set_binary_blob(triangles_binary_blob + points_binary_blob+
+                             times_blob+scales_blob)
+        #
+        #
+        gfn=self.gfn(fn)
+        gltf.save(gfn)
+
     def write_warping_csv(self,fn):
+        if fn==None:
+            fn=self.default_filename(suffix='.csv',use_case='warping')
         x=self.mesh_nodes[:,0]
         y=self.mesh_nodes[:,1]
         z=self.section_props.omega
@@ -134,6 +308,8 @@ class DevSection(Section):
         print("Wrote {0}".format(fn))
 
     def write_triangles_csv(self,fn):
+        if fn==None:
+            fn=self.default_filename(suffix='.csv',use_case='triangles')
         rows=self.get_triangles();
         with open(self.gfn(fn), 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
@@ -206,7 +382,7 @@ def add_common_arguments(parser):
                         default=4,type=int)
     parser.add_argument("-D","--diameter", help="diameter",
                         default=1,type=float)
-    parser.add_argument("-N","--count", help="count of points",
+    parser.add_argument("-N","--count", help="count of points for diameter",
                         default=32,type=int)
     parser.add_argument("--title")
     parser.add_argument("--section_type")

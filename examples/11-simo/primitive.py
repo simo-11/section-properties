@@ -15,24 +15,21 @@ import sectionproperties.pre.library.primitive_sections as sections
 import sectionproperties.pre.library.steel_sections as steel_sections
 #from sectionproperties.analysis.section import Section
 import simo.dev
-RECTANGLE='rectangle'
-CIRCULAR='circular'
-RHS='rhs'
-CHS='chs'
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("--primitive", help="type of primitive",
-                    default=RECTANGLE,choices=[RECTANGLE,CIRCULAR,RHS,CHS])
+                    default=simo.dev.RECTANGLE,
+                    choices=simo.dev.PRIMITIVE_CHOICES)
 simo.dev.add_common_arguments(parser)
 args = parser.parse_args()
 simo.dev.check_arguments(parser,args)
 bending=args.bending
 frame_analysis=args.frame_analysis
-if args.primitive==RECTANGLE:
+if args.primitive==simo.dev.RECTANGLE:
     args.title=("{2}: width = {0:.5g} and height = {1:.5g}".
       format(args.width, args.height,args.primitive))
     geometry = sections.rectangular_section(args.width, args.height)
-elif args.primitive==RHS:
+elif args.primitive==simo.dev.RHS:
     if args.n_r>0:
         if args.radius<args.thickness:
             args.radius=2*args.thickness
@@ -46,13 +43,13 @@ elif args.primitive==RHS:
               args.radius,args.n_r))
     geometry = steel_sections.rectangular_hollow_section(args.width,
         args.height,args.thickness,args.radius,args.n_r)
-elif args.primitive==CIRCULAR:
+elif args.primitive==simo.dev.CIRCULAR:
     args.title=("{2}: diameter = {0:.5g} and count = {1}".
       format(args.diameter, args.count,args.primitive))
     geometry = sections.circular_section(args.diameter, args.count)
     args.width=args.diameter
     args.height=args.diameter
-elif args.primitive==CHS:
+elif args.primitive==simo.dev.CHS:
     args.title=("""{2}: outer diameter={0:.5g},
 thickness={1:.5g} and count={3}""".
        format(args.diameter, args.thickness, args.primitive, args.count))
@@ -106,15 +103,9 @@ while simo.dev.run(args):
         if args.plot_warping_values:
             section.plot_warping_values()
         if args.write_warping_csv:
-            fn=("{3}-{0:g}-{1:g}-{2}.csv".
-                format(1000*args.width,1000*args.height,
-                       len(section.section_props.omega),args.primitive))
-            section.write_warping_csv(fn)
+            section.write_warping_csv()
         if args.write_triangles_csv:
-            fn=("{3}-tri-{0:g}-{1:g}-{2}.csv".
-                format(1000*args.width,1000*args.height,
-                       len(section.section_props.omega),args.primitive))
-            section.write_triangles_csv(fn)
+            section.write_triangles_csv()
     itDiff=abs((it-it0)/it0)
     if section.done(ms,itDiff,iwDiff):
         break
