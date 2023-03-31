@@ -27,7 +27,7 @@ runfile('primitive.py',#noqa
 # %% chs
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
-   --count=128""")
+   --count=105""")
 # %% cold-formed-u
 runfile('cold-formed-u.py',#noqa
   args="""-A -W 1 -H 2 --thickness=0.08 --mesh_size=0.5""")
@@ -97,13 +97,13 @@ Mzz=1e6
 It=math.pi*math.pow(d,4)/32
 tau=Mzz/It*r
 print("d={0}, It={1:.3g}, Mzz={2:.3g}, tau={3:.3g}".format(d,It,Mzz,tau))
-# %% analytic for chs, outer diameter=1, t=0.03: 214 MPa
-# section-properties(n=32): 241 MPa (+ 12 %)
-# section-properties(n=64): 233 MPa (+ 8 %)
-# section-properties(n=128): 232 MPa (+ 8 %)
+# %% analytic for chs, outer diameter=1, t=0.03: 23.2 MPa, It=0.0215
+# section-properties(n=32), 965 elements: 24.3 MPa (+ 5 %), It=0.0212 (- 1 %)
+# section-properties(n=64): 128-1023 elemenets 23.8 MPa (+ 3 %), It=0.0215
+# section-properties(n=128): 256-512 elements 23.2 MPa It=0.0215
 import math
 d=1
-t=0.003
+t=0.03
 d2=d-2*t
 r=d/2
 Mzz=1e6
