@@ -14,7 +14,11 @@ See
 
 ### Changes
 Samples in [primitive.py](primitive.py) and [cold-formed-u.py](cold-formed-u.py).
-Run using [sample-cells.py](sample-cells.py)
+
+Run using [sample-cells.py](sample-cells.py).
+In Spyder set working directory to section-properties\examples\11-simo and press CTRL-Enter on wanted cell.
+
+
 Common parts in [dev.py](simo/dev.py)
 
 #### matplotlib.pyplot plotting
