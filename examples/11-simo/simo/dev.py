@@ -155,7 +155,7 @@ class DevSection(Section):
     def uses_n_r(self):
         return self.args.primitive in (RHS,COLD_FORMED_U)
 
-    def write_warping_csv(self,fn):
+    def write_warping_csv(self,fn=None):
         if fn==None:
             fn=self.default_filename(suffix='.csv',use_case='warping')
         x=self.mesh_nodes[:,0]
@@ -171,7 +171,7 @@ class DevSection(Section):
             writer.writerows(rows)
         print("Wrote {0}".format(fn))
 
-    def write_triangles_csv(self,fn):
+    def write_triangles_csv(self,fn=None):
         if fn==None:
             fn=self.default_filename(suffix='.csv',use_case='triangles')
         rows=self.get_triangles();

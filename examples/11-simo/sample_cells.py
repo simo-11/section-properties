@@ -13,6 +13,9 @@ Matlab has quite similar feature for matlab-scripts but uses
 # %% rectangle
 runfile('primitive.py',#noqa
   args="""-A -W 0.085 -H 0.118 --mesh_size=0.00003 --primitive=rectangle""")
+# %% rectangle 1-1
+runfile('primitive.py',#noqa
+  args="""-A -W=1 -H=1 --mesh_size=0.003 --primitive=rectangle""")
 # %% circle
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --mesh_size=0.05 --primitive=circular""")
@@ -31,7 +34,7 @@ runfile('primitive.py',#noqa
    --count=105""")
 # %% cold-formed-u
 runfile('cold-formed-u.py',#noqa
-  args="""-A -W 1 -H 2 --thickness=0.08 --n_r=0 --mesh_size=0.05""")
+  args="""-A -W 0.05 -H 0.1 --thickness=0.004 --n_r=0 --mesh_size=0.05""")
 # %% plot_geometry
 section.geometry.plot_geometry()#noqa
 # %% plot_mesh
@@ -67,6 +70,8 @@ plt.show()
 section.plot_warping_values()#noqa
 # %% contour_warping_values
 section.contour_warping_values(levels=51)#noqa
+# %% write_warping_csv
+section.write_warping_csv()#noqa
 # %% write_warping_gltf
 # can be moved to dev.DecSection
 import pygltflib
