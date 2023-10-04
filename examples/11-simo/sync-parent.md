@@ -18,3 +18,4 @@ section-properties\sectionproperties\analysis> git commit -m"merge from parent"
 section-properties\sectionproperties\analysis> git push
 ```
 ### Disable workflow runs
+https://github.com/simo-11/section-properties/settings/actions
