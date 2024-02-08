@@ -21,7 +21,7 @@ section-properties\sectionproperties\analysis> git push
 ### Disable workflow runs
 https://github.com/simo-11/section-properties/settings/actions
 
-### uninstall sectionproperties 2.1.5 and switch python from 3.10.11 to 3.11.6 (default)
+### uninstall sectionproperties 2.1.5 and switch python from 3.10.11 to 3.11.8 (default)
 ```
 > pip -v uninstall sectionproperties
 ..
@@ -31,6 +31,6 @@ github\section-properties> pyenv local --unset
 ```
 Switch python in spyder (Tools/Preferences/Python) and install spyder-kernels pygltflib and sectionproperties
 ```
-github\section-properties> pip install spyder-kernels==2.4.* pygltflib sectionproperties
+PS> pip install spyder-kernels==2.5.* pygltflib sectionproperties
 ```
 
