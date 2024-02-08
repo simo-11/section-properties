@@ -26,6 +26,34 @@ package index:
 
     pip install sectionproperties
 
+Installing ``Numba``
+--------------------
+
+``Numba`` translates a subset of Python and NumPy code into fast machine code, allowing
+algorithms to approach the speeds of C. The speed of several ``sectionproperties``
+analysis functions have been enhanced with `numba <https://github.com/numba/numba>`_.
+To take advantage of this increase in performance you can install ``numba`` alongside
+``sectionproperties`` with:
+
+.. code-block:: shell
+
+    pip install sectionproperties[numba]
+
+Installing ``PARDISO`` Solver
+-----------------------------
+
+The default sparse solver used in ``scipy`` is ``SuperLU``.
+It performs okay for small matrices but appears to be very slow for larger matrices.
+The ``PARDISO`` solver is a much faster alternative
+(see `pypardiso <https://github.com/haasad/PyPardisoProject>`_), but it requires the
+installation of the ``MKL`` library, which takes a lot of disk space.
+
+If you do not have a disk space constraint, you can use the ``PARDISO`` solver by:
+
+.. code-block:: shell
+
+    pip install sectionproperties[pardiso]
+
 Installing CAD Modules
 ----------------------
 
@@ -43,6 +71,3 @@ To install ``sectionproperties`` with the above functionality, use the ``dxf`` a
 
     pip install sectionproperties[dxf]
     pip install sectionproperties[rhino]
-
-Note that the ``rhino`` option only supports python ``3.9`` due to incomplete wheel
-coverage of ``rhino3dm``.

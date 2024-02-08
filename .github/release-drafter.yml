@@ -53,8 +53,7 @@ exclude-contributors:
 
 # Custom text at start of release
 header: |
-  This release addresses a bug with the concrete rectangular section side bars and
-  bumps several python and github actions dependencies.
+  This release makes `numba` an optional dependency, adds strict `mypy` type checking and modifies the application of the Lagrangian Multipler method.
 
 template: |
   ## What's Changed

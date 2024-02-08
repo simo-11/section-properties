@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import numpy.typing as npt
 from rich.progress import (
     BarColumn,
     Progress,
@@ -17,12 +18,20 @@ from scipy.sparse import csc_matrix, linalg
 from scipy.sparse.linalg import LinearOperator, spsolve
 
 
+try:
+    import pypardiso
+
+    sp_solve = pypardiso.spsolve
+except ImportError:
+    sp_solve = spsolve
+
+
 def solve_cgs(
     k: csc_matrix,
-    f: np.ndarray,
+    f: npt.NDArray[np.float64],
     m: LinearOperator | None = None,
     tol: float = 1e-5,
-) -> np.ndarray:
+) -> npt.NDArray[np.float64]:
     """Solves a linear system using the CGS iterative method.
 
     Args:
@@ -43,15 +52,15 @@ def solve_cgs(
     if info != 0:
         raise RuntimeError("CGS iterative method did not converge.")
 
-    return u
+    return u  # type: ignore
 
 
 def solve_cgs_lagrange(
     k_lg: csc_matrix,
-    f: np.ndarray,
+    f: npt.NDArray[np.float64],
     m: LinearOperator | None = None,
     tol: float = 1e-5,
-) -> np.ndarray:
+) -> npt.NDArray[np.float64]:
     """Solves a linear system using the CGS iterative method (Lagrangian multiplier).
 
     Args:
@@ -79,13 +88,13 @@ def solve_cgs_lagrange(
     if err > tol:
         raise RuntimeError("Lagrangian multiplier method error exceeds tolerance.")
 
-    return u[:-1]
+    return u[:-1]  # type: ignore
 
 
 def solve_direct(
     k: csc_matrix,
-    f: np.ndarray,
-) -> np.ndarray:
+    f: npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
     """Solves a linear system using the direct solver method.
 
     Args:
@@ -95,13 +104,13 @@ def solve_direct(
     Returns:
         The solution vector to the linear system of equations
     """
-    return spsolve(A=k, b=f)
+    return sp_solve(A=k, b=f)  # type: ignore
 
 
 def solve_direct_lagrange(
     k_lg: csc_matrix,
-    f: np.ndarray,
-) -> np.ndarray:
+    f: npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
     """Solves a linear system using the direct solver method (Lagrangian multiplier).
 
     Args:
@@ -112,20 +121,24 @@ def solve_direct_lagrange(
         The solution vector to the linear system of equations
 
     Raises:
-        RuntimeError: If the Lagrangian multiplier method exceeds a tolerance of
-            ``1e-5``
+        RuntimeError: If the Lagrangian multiplier method exceeds a relative tolerance
+            of ``1e-7`` or absolute tolerance related to your machine's floating point
+            precision.
     """
-    u = spsolve(A=k_lg, b=np.append(f, 0))
+    u = sp_solve(A=k_lg, b=np.append(f, 0))
 
     # compute error
     multiplier = abs(u[-1])
     rel_error = multiplier / max(np.absolute(u))
 
     if rel_error > 1e-7 and multiplier > 10.0 * np.finfo(float).eps:
-        msg = "Lagrangian multiplier method error exceeds tolerance of 1e-5."
-        raise RuntimeError(msg)
+        raise RuntimeError(
+            "Lagrangian multiplier method error exceeds the prescribed tolerance, "
+            "consider refining your mesh. If this error is unexpected raise an issue "
+            "at https://github.com/robbievanleeuwen/section-properties/issues."
+        )
 
-    return u[:-1]
+    return u[:-1]  # type: ignore
 
 
 class CustomTimeElapsedColumn(ProgressColumn):
