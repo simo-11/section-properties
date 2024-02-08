@@ -44,9 +44,9 @@ w=s.args.width
 h=s.args.height
 alpha=0.5
 mask=None
-x=s.mesh_nodes[:,0]
-y=s.mesh_nodes[:,1]
-t=s.mesh_elements[:, 0:3]
+x=s._mesh_nodes[:,0]
+y=s._mesh_nodes[:,1]
+t=s._mesh_elements[:, 0:3]
 fig, ax = plt.subplots()
 s.set_box_aspect(ax)
 ax.triplot(x,y,t,lw=0.5,color="black",alpha=alpha,mask=mask)
@@ -79,10 +79,10 @@ import numpy as np
 def write_warping_gltf(self,fn=None):
     if fn==None:
         fn=self.default_filename(suffix='.glb',use_case='warping')
-    ps=len(self.mesh_nodes)
+    ps=len(self._mesh_nodes)
     points=np.empty((ps,3),dtype="float32")
-    points[:,0]=self.mesh_nodes[:,0]
-    points[:,1]=self.mesh_nodes[:,1]
+    points[:,0]=self._mesh_nodes[:,0]
+    points[:,1]=self._mesh_nodes[:,1]
     points[:,2]=self.section_props.omega
     triangles=self.get_triangles()
     triangles_binary_blob = triangles.flatten().tobytes()
@@ -288,8 +288,8 @@ if title:
     ax.set_title(title)
 axins = ax.inset_axes([0.1, 0.1, 0.7, 0.7])
 s.set_box_aspect(axins)
-x=s.mesh_nodes[:,0]
-y=s.mesh_nodes[:,1]
+x=s._mesh_nodes[:,0]
+y=s._mesh_nodes[:,1]
 triangles=s.get_triangles()#noqa
 z=s.section_props.omega#noqa
 trictr = axins.tricontourf(x, y, triangles, z,levels=levels)

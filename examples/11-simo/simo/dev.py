@@ -27,7 +27,7 @@ class DevSection(Section):
     """
     def get_triangles(self):
         if not isinstance(self.triangles,np.ndarray):
-            ma=self.mesh_elements
+            ma=self._mesh_elements
             ne=len(ma)
             nt=4*ne
             ti=0
@@ -84,8 +84,8 @@ class DevSection(Section):
     def plot_warping_values(self):
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
         ax.set_box_aspect(self.get_box_aspect())
-        x=self.mesh_nodes[:,0]
-        y=self.mesh_nodes[:,1]
+        x=self._mesh_nodes[:,0]
+        y=self._mesh_nodes[:,1]
         z=self.section_props.omega
         triangles=self.get_triangles()
         ax.plot_trisurf(x, y,triangles, z)
@@ -102,8 +102,8 @@ class DevSection(Section):
     def contour_warping_values(self, levels=9):
         fig, ax = plt.subplots()
         self.set_box_aspect(ax)
-        x=self.mesh_nodes[:,0]
-        y=self.mesh_nodes[:,1]
+        x=self._mesh_nodes[:,0]
+        y=self._mesh_nodes[:,1]
         triangles=self.get_triangles()
         z=self.section_props.omega
         trictr = ax.tricontourf(x, y, triangles, z,levels=levels)
@@ -158,8 +158,8 @@ class DevSection(Section):
     def write_warping_csv(self,fn=None):
         if fn==None:
             fn=self.default_filename(suffix='.csv',use_case='warping')
-        x=self.mesh_nodes[:,0]
-        y=self.mesh_nodes[:,1]
+        x=self._mesh_nodes[:,0]
+        y=self._mesh_nodes[:,1]
         z=self.section_props.omega
         rows=np.empty([len(x),3],dtype=float)
         rows[:,0]=x
