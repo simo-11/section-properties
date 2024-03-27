@@ -16,6 +16,9 @@ runfile('primitive.py',#noqa
 # %% rectangle 1-1
 runfile('primitive.py',#noqa
   args="""-A -W=1 -H=1 --mesh_size=0.003 --primitive=rectangle""")
+# %% rectangle 100-4
+runfile('primitive.py',#noqa
+  args="""-A -W=0.004 -H=0.1 --mesh_size=1e-6 --primitive=rectangle""")
 # %% circle
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --mesh_size=0.05 --primitive=circular""")
@@ -28,6 +31,10 @@ runfile('primitive.py',#noqa
 runfile('primitive.py',#noqa
   args="""-A -W 0.1 -H 0.1 --thickness=0.004 --mesh_size=1e-5
   --primitive=rhs --n_r=0""")
+# %% Timo's rhs with rounder corners
+runfile('primitive.py',#noqa
+  args="""-A -W 0.1 -H 0.1 --thickness=0.004 --mesh_size=1e-6
+  --primitive=rhs --n_r=8""")
 # %% chs
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --thickness 0.03 --mesh_size=0.2 --primitive=chs
