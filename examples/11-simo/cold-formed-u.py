@@ -77,7 +77,7 @@ if args.n_r>0:
 else:
     args.radius=0
 args.title=("""{5}: width={0:.5g}, height={1:.5g},
-thickness={2:.5g}, outer radius={3:.5g}, n_r={4}""".
+USection: thickness={2:.5g}, outer radius={3:.5g}, n_r={4}""".
       format(args.width, args.height,args.thickness,
              args.radius,args.n_r,args.section_type))
 bending=args.bending
@@ -160,6 +160,8 @@ while simo.dev.run(args):
             continue
         iw = section.get_gamma()
         iwDiff=abs((iw-iw0)/iw0)
+        print(("It = {0:.3g}, Iw = {1:.3g}, k(steel) = {2:.2f}")
+              .format(it,iw,math.sqrt(it/(2.6*iw))))
         print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
         print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
         if args.plot_warping_values:

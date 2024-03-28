@@ -99,7 +99,8 @@ while simo.dev.run(args):
             continue
         iw = section.get_gamma()
         iwDiff=abs((iw-iw0)/iw0)
-        print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
+        print(("It = {0:.3g}, Iw = {1:.3g}, k(steel) = {2:.2f}")
+              .format(it,iw,math.sqrt(it/(2.6*iw))))
         if args.plot_warping_values:
             section.plot_warping_values()
         if args.write_warping_csv:

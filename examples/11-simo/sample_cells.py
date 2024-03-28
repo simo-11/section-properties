@@ -13,9 +13,15 @@ Matlab has quite similar feature for matlab-scripts but uses
 # %% rectangle
 runfile('primitive.py',#noqa
   args="""-A -W 0.085 -H 0.118 --mesh_size=0.00003 --primitive=rectangle""")
-# %% rectangle 1-1
+# %% rectangle 1000-1000
 runfile('primitive.py',#noqa
   args="""-A -W=1 -H=1 --mesh_size=0.003 --primitive=rectangle""")
+# %% rectangle 100-100
+runfile('primitive.py',#noqa
+  args="""-A -W=0.1 -H=0.1 --mesh_size=1e-3 --primitive=rectangle""")
+# %% rectangle 100-10
+runfile('primitive.py',#noqa
+  args="""-A -W=0.1 -H=0.01 --mesh_size=1e-4 --primitive=rectangle""")
 # %% rectangle 100-4
 runfile('primitive.py',#noqa
   args="""-A -W=0.004 -H=0.1 --mesh_size=1e-6 --primitive=rectangle""")
@@ -34,6 +40,10 @@ runfile('primitive.py',#noqa
 # %% Timo's rhs with rounder corners
 runfile('primitive.py',#noqa
   args="""-A -W 0.1 -H 0.1 --thickness=0.004 --mesh_size=1e-6
+  --primitive=rhs --n_r=8""")
+# %% rsh 200x100x4
+runfile('primitive.py',#noqa
+  args="""-A -W 0.1 -H 0.2 --thickness=0.004 --mesh_size=1e-6
   --primitive=rhs --n_r=8""")
 # %% chs
 runfile('primitive.py',#noqa
