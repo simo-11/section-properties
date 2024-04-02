@@ -18,7 +18,7 @@ runfile('primitive.py',#noqa
   args="""-A -W=1 -H=1 --mesh_size=0.003 --primitive=rectangle""")
 # %% rectangle 100-100
 runfile('primitive.py',#noqa
-  args="""-A -W=0.1 -H=0.1 --mesh_size=1e-3 --primitive=rectangle""")
+  args="""-A -W=0.1 -H=0.1 --mesh_size=1e-4 --primitive=rectangle""")
 # %% rectangle 100-10
 runfile('primitive.py',#noqa
   args="""-A -W=0.1 -H=0.01 --mesh_size=1e-4 --primitive=rectangle""")
