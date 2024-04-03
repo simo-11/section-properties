@@ -5,7 +5,7 @@
 ### Sync at local client
 ```
 github\section-properties> git remote add parent https://github.com/robbievanleeuwen/section-properties
-github\section-properties> git pull parent master
+github\section-properties> git pull --tags parent master
 CONFLICT (modify/delete): sectionproperties/analysis/section.py deleted in
   2ea83cdd5394450fd51fed22321c8ea94550d258 and modified in HEAD.
 Version HEAD of sectionproperties/analysis/section.py left in tree.
@@ -16,7 +16,7 @@ Unmerged paths:
         deleted by them: section.py
 section-properties\sectionproperties\analysis> git rm section.py
 section-properties\sectionproperties\analysis> git commit -m"merge from parent"
-section-properties\sectionproperties\analysis> git push
+section-properties\sectionproperties\analysis> git push --tags
 ```
 ### Disable workflow runs
 https://github.com/simo-11/section-properties/settings/actions
@@ -33,4 +33,12 @@ Switch python in spyder (Tools/Preferences/Python) and install spyder-kernels py
 ```
 PS> pip install spyder-kernels==2.5.* pygltflib sectionproperties
 ```
+### Upgrade sectionproperties
+```
+> pip install sectionproperties --upgrade
+> pip show sectionproperties
+Name: sectionproperties
+Version: 3.2.0
+```
+
 
