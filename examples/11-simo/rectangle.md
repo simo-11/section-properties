@@ -21,7 +21,7 @@ Wrote warping-rectangle-100-100-357.csv
 
 Create surface fit to data provided by csv files using Curve fitting toolbox
  * cubicinterp - Cubic spline interpolation
- * polyij - polynomial surfaces where i is the degree in x and j is the degree in y. The maximum for both i and j is five.
+ * poly44 - polynomial surfaces where i is the degree in x and j is the degree in y. The maximum for both i and j is five. For rectangle 44 gives quite good results.
  * anonymous function - see fittype for details
    * test process by using known analytical solution https://en.wikiversity.org/wiki/Warping_functions#Example_3:_Rectangular_Cylinder for few lowest values of n  
 
@@ -62,3 +62,21 @@ Caused by:
     Type conversion failed at <obj>(1).expr.
         Class function_handle is not supported by coder.Type.
 ```
+### Upper level script
+Reads all files selected by rectangle dimensions and performs cubicinterp and poly44 fits.
+```
+>> c100=testRectangle(height=100,width=100)
+>> c100{1}
+ struct with fields:
+
+                  t: [357×3 table]
+               file: "C:\Users\simon\github\section-properties\examples\11-simo\gen/warping-rectangle-100-100-357.csv"
+        cubicinterp: 1.3570e-10
+    cubicinterp_fit: [1×1 sfit]
+             poly44: 1.3591e-10
+         poly44_fit: [1×1 sfit]
+>> figure(101)
+>> plot(c100{1}.poly44_fit,[c100{1}.t.x c100{1}.t.y],c100{1}.t.w);
+```
+![image](https://github.com/simo-11/section-properties/assets/1210784/0d7dee0b-3db8-4541-8883-41deed27b57b)
+
