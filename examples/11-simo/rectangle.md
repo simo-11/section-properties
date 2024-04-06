@@ -1,5 +1,6 @@
 # Rectangle
-In spyder
+
+## In spyder
 ```
 runcell('rectangle 100-100', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
 rectangle: width = 0.1 and height = 0.1
@@ -14,7 +15,9 @@ meshSize = 0.0001, 357 nodes, 162 elements
 runcell('write_warping_csv', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
 Wrote warping-rectangle-100-100-357.csv
 ```
-In matlab
+## In matlab 
+
+using 41 node function as input to cubicinterp produces reasonable approximation and recalculated value of Iw is about 8 % too high
 ```
 > fprintf("%s\n",pwd)
 C:\Users\simon\github\section-properties\examples\11-simo
@@ -29,6 +32,9 @@ warping-rectangle-100-100-41.csv
 >> fun=@(x,y)f1(x,y)^2;
 >> fprintf("%.3g\n",integral2(fun,0.,0.1,0,0.1))
 1.46e-10
+```
+Using 357 nodes reduces error in Iw to less than 1 %.
+```
 >> t2=readtable('gen/warping-rectangle-100-100-357.csv');
 >> f2=fit([t2.x t2.y],t2.w,'cubicinterp');
 >> plot(f2,[t2.x t2.y],t2.w);
