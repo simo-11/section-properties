@@ -1,5 +1,8 @@
 # Rectangle
-In spyder
+
+## In spyder
+
+Create data files in csv format for warping functions
 ```
 runcell('rectangle 100-100', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
 rectangle: width = 0.1 and height = 0.1
@@ -14,21 +17,32 @@ meshSize = 0.0001, 357 nodes, 162 elements
 runcell('write_warping_csv', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
 Wrote warping-rectangle-100-100-357.csv
 ```
-In matlab
+## In matlab 
+
+Create surface fit to data provided by csv files using Curve fitting toolbox
+ * cubicinterp - Cubic spline interpolation
+ * poly44 - polynomial surfaces where i is the degree in x and j is the degree in y. The maximum for both i and j is five. For rectangle 44 gives quite good results.
+ * anonymous function - see fittype for details
+   * test process by using known analytical solution https://en.wikiversity.org/wiki/Warping_functions#Example_3:_Rectangular_Cylinder for few lowest values of n  
+
+using 41 node function as input to cubicinterp produces reasonable approximation and recalculated value of Iw is about 8 % too high
 ```
 > fprintf("%s\n",pwd)
 C:\Users\simon\github\section-properties\examples\11-simo
 >> dir gen/*.csv
 warping-rectangle-100-100-41.csv
->> t1=readtable('gen/warping-rectangle-100-100-41.csv');
->> f1=fit([t1.x t1.y],t1.w,'cubicinterp');
->> plot(f1,[t1.x t1.y],t1.w);
+>> t41=readtable('gen/warping-rectangle-100-100-41.csv');
+>> c41=fit([t41.x t41.y],t41.w,'cubicinterp');
+>> plot(c41,[t41.x t41.y],t41.w);
 ```
 ![image](https://github.com/simo-11/section-properties/assets/1210784/7a02dc7d-5467-40ac-988a-1167b797ca06)
 ```
->> fun=@(x,y)f1(x,y)^2;
->> fprintf("%.3g\n",integral2(fun,0.,0.1,0,0.1))
+>> fun41=@(x,y)c41(x,y).^2;
+>> fprintf("%.3g\n",integral2(fun41,0.,0.1,0,0.1))
 1.46e-10
+```
+Using 357 nodes reduces error in Iw to less than 1 %.
+```
 >> t2=readtable('gen/warping-rectangle-100-100-357.csv');
 >> f2=fit([t2.x t2.y],t2.w,'cubicinterp');
 >> plot(f2,[t2.x t2.y],t2.w);
@@ -48,3 +62,21 @@ Caused by:
     Type conversion failed at <obj>(1).expr.
         Class function_handle is not supported by coder.Type.
 ```
+### Upper level script
+Reads all files selected by rectangle dimensions and performs cubicinterp and poly44 fits.
+```
+>> c100=testRectangle(height=100,width=100)
+>> c100{1}
+ struct with fields:
+
+                  t: [357×3 table]
+               file: "C:\Users\simon\github\section-properties\examples\11-simo\gen/warping-rectangle-100-100-357.csv"
+        cubicinterp: 1.3570e-10
+    cubicinterp_fit: [1×1 sfit]
+             poly44: 1.3591e-10
+         poly44_fit: [1×1 sfit]
+>> figure(101)
+>> plot(c100{1}.poly44_fit,[c100{1}.t.x c100{1}.t.y],c100{1}.t.w);
+```
+![image](https://github.com/simo-11/section-properties/assets/1210784/0d7dee0b-3db8-4541-8883-41deed27b57b)
+
