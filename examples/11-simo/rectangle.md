@@ -80,3 +80,50 @@ Reads all files selected by rectangle dimensions and performs cubicinterp and po
 ```
 ![image](https://github.com/simo-11/section-properties/assets/1210784/0d7dee0b-3db8-4541-8883-41deed27b57b)
 
+## 100-10
+Iw should be about 6.6e-12
+
+### Spyder
+```
+runcell('rectangle 100-10', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+Reloaded modules: simo, simo.dev
+rectangle: width = 0.1 and height = 0.01
+It = 3.13e-08, Iw = 6.64e-12, k(steel) = 42.54
+meshSize = 1e-05, 375 nodes, 160 elements
+runcell('write_warping_csv', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+Wrote warping-rectangle-10-100-375.csv
+```
+### Matlab
+```
+>> r=testRectangle(height=10,width=100,plot=1);
+```
+![image](https://github.com/simo-11/section-properties/assets/1210784/8ac719b9-badd-45c2-b8c1-9966f7061771)
+
+
+## 100-4
+Iw should be about 4.4e-13
+
+### Spyder
+
+```
+runcell('rectangle 100-4', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+rectangle: width = 0.004 and height = 0.1
+It = 2.09e-09, Iw = 4.42e-13, k(steel) = 42.66
+meshSize = 1e-05, 171 nodes, 56 elements
+runcell('write_warping_csv', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+Wrote warping-rectangle-100-4-171.csv
+
+runcell('rectangle 100-4', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+rectangle: width = 0.004 and height = 0.1
+It = 2.08e-09, Iw = 4.41e-13, k(steel) = 42.58
+meshSize = 1e-06, 1397 nodes, 620 elements
+runcell('write_warping_csv', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+Wrote warping-rectangle-100-4-1397.csv
+```
+### matlab
+```
+>> r=testRectangle(height=100,width=4,plot=1)
+```
+![image](https://github.com/simo-11/section-properties/assets/1210784/7dd79516-126c-4dee-be22-dfe763fa7476)
+
+![image](https://github.com/simo-11/section-properties/assets/1210784/49bf0827-c37c-4ad0-ad57-badac2ce67d6)
