@@ -80,3 +80,17 @@ Reads all files selected by rectangle dimensions and performs cubicinterp and po
 ```
 ![image](https://github.com/simo-11/section-properties/assets/1210784/0d7dee0b-3db8-4541-8883-41deed27b57b)
 
+## 100-4
+Iw should be about 4.4e-13
+```
+runcell('rectangle 100-4', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+Reloaded modules: simo, simo.dev
+rectangle: width = 0.004 and height = 0.1
+It = 2.09e-09, Iw = 4.42e-13, k(steel) = 42.66
+meshSize = 1e-05, 171 nodes, 56 elements
+
+runcell('rectangle 100-4', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
+rectangle: width = 0.004 and height = 0.1
+It = 2.08e-09, Iw = 4.41e-13, k(steel) = 42.58
+meshSize = 1e-06, 1442 nodes, 641 elements
+```
