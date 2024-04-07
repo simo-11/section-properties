@@ -28,7 +28,7 @@ frame_analysis=args.frame_analysis
 if args.primitive==simo.dev.RECTANGLE:
     args.title=("{2}: width = {0:.5g} and height = {1:.5g}".
       format(args.width, args.height,args.primitive))
-    geometry = sections.rectangular_section(args.width, args.height)
+    geometry = sections.rectangular_section(args.height, args.width)
 elif args.primitive==simo.dev.RHS:
     if args.n_r>0:
         if args.radius<args.thickness:

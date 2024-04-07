@@ -21,10 +21,10 @@ runfile('primitive.py',#noqa
   args="""-A -W=0.1 -H=0.1 --mesh_size=1e-4 --primitive=rectangle""")
 # %% rectangle 100-10
 runfile('primitive.py',#noqa
-  args="""-A -W=0.1 -H=0.01 --mesh_size=1e-4 --primitive=rectangle""")
+  args="""-A -W=0.1 -H=0.01 --mesh_size=1e-5 --primitive=rectangle""")
 # %% rectangle 100-4
 runfile('primitive.py',#noqa
-  args="""-A -W=0.004 -H=0.1 --mesh_size=1e-6 --primitive=rectangle""")
+  args="""-A -W=0.004 -H=0.1 --mesh_size=1e-5 --primitive=rectangle""")
 # %% circle
 runfile('primitive.py',#noqa
   args="""-A --diameter 1 --mesh_size=0.05 --primitive=circular""")
