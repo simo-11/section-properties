@@ -1,6 +1,8 @@
 # Rectangle
 
-## In spyder
+## Square 100-100
+
+### In spyder
 
 Create data files in csv format for warping functions
 ```
@@ -17,7 +19,7 @@ meshSize = 0.0001, 357 nodes, 162 elements
 runcell('write_warping_csv', 'C:/Users/simon/github/section-properties/examples/11-simo/sample_cells.py')
 Wrote warping-rectangle-100-100-357.csv
 ```
-## In matlab 
+### In matlab 
 
 Create surface fit to data provided by csv files using Curve fitting toolbox
  * cubicinterp - Cubic spline interpolation
@@ -130,6 +132,41 @@ Wrote warping-rectangle-10-100-375.csv
 ```
 ![image](https://github.com/simo-11/section-properties/assets/1210784/8ac719b9-badd-45c2-b8c1-9966f7061771)
 
+```
+>> w=testRectangle(debugLevel=2,models=["poly44"],plot=0,height=10,width=100);
+file=warping-rectangle-10-100-375.csv
+x values: 0 - 0.1
+y values: 0 - 0.01
+w values: -0.000226 - 0.000226
+model=poly44
+     Linear model Poly44:
+     f(x,y) = p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p02*y^2 + p30*x^3 + p21*x^2*y 
+                    + p12*x*y^2 + p03*y^3 + p40*x^4 + p31*x^3*y + p22*x^2*y^2 
+                    + p13*x*y^3 + p04*y^4
+     Coefficients (with 95% confidence bounds):
+       p00 =  -0.0002339  (-0.0002361, -0.0002317) -- important
+       p10 =    0.003616  (0.003414, 0.003819) -- important
+       p01 =     0.04727  (0.04568, 0.04885) -- important
+       p20 =     0.03242  (0.02553, 0.0393) -- important 
+       p11 =     -0.7427  (-0.7869, -0.6985) -- important
+       p02 =     -0.1243  (-0.6633, 0.4147)
+       p30 =     -0.2292  (-0.3249, -0.1336)
+       p21 =      -6.124  (-6.757, -5.491) -- important
+       p12 =       3.039  (-2.694, 8.772)
+       p03 =       7.493  (-68.29, 83.27)
+       p40 =      0.1197  (-0.3439, 0.5834)
+       p31 =        40.7  (37.15, 44.25) -- important
+       p22 =       1.631  (-29.47, 32.73)
+       p13 =      -215.7  (-526.4, 95.02)
+       p04 =       100.2  (-3572, 3772)
+           sse: 1.7980e-09
+       rsquare: 0.9995
+           dfe: 360
+    adjrsquare: 0.9994
+          rmse: 2.2348e-06
+
+Iw=6.62e-12
+```
 
 ## 100-4
 Iw should be about 4.4e-13
@@ -153,7 +190,72 @@ Wrote warping-rectangle-100-4-1397.csv
 ```
 ### matlab
 ```
->> r=testRectangle(height=100,width=4,plot=1)
+>> w=testRectangle(debugLevel=2,models=["poly44"],plot=0,height=100,width=4);
+file=warping-rectangle-100-4-1397.csv
+x values: 0 - 0.004
+y values: 0 - 0.1
+w values: -9.62e-05 - 9.62e-05
+model=poly44
+     Linear model Poly44:
+     f(x,y) = p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p02*y^2 + p30*x^3 + p21*x^2*y 
+                    + p12*x*y^2 + p03*y^3 + p40*x^4 + p31*x^3*y + p22*x^2*y^2 
+                    + p13*x*y^3 + p04*y^4
+     Coefficients (with 95% confidence bounds):
+       p00 =   9.869e-05  (9.853e-05, 9.885e-05) -- important
+       p10 =    -0.04944  (-0.04973, -0.04914) -- important, transforms origin
+       p01 =   -0.001887  (-0.001902, -0.001872) -- important, transforms origin
+       p20 =     0.05794  (-0.197, 0.3129) -- not important
+       p11 =      0.9445  (0.9359, 0.9531) -- important
+       p02 =   -0.002523  (-0.00304, -0.002006) -- important
+       p30 =       2.479  (-87.79, 92.75) -- not important
+       p21 =       -2.29  (-5.106, 0.5266) -- not important
+       p12 =       1.353  (1.229, 1.476) -- important
+       p03 =     0.01494  (0.007673, 0.02221) -- not important
+       p40 =       -2769  (-1.379e+04, 8253) -- not important
+       p31 =       394.7  (7.439, 781.9) -- not important
+       p22 =      0.1674  (-15.76, 16.1) -- not important
+       p13 =      -8.992  (-9.699, -8.286) -- important
+       p04 =     0.01662  (-0.01898, 0.05222) -- not important
+           sse: 1.5201e-10
+       rsquare: 0.9999
+           dfe: 1382
+    adjrsquare: 0.9999
+          rmse: 3.3165e-07
+
+Iw=4.4e-13
+file=warping-rectangle-100-4-171.csv
+x values: 0 - 0.004
+y values: 0 - 0.1
+w values: -9.6e-05 - 9.59e-05
+model=poly44
+     Linear model Poly44:
+     f(x,y) = p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p02*y^2 + p30*x^3 + p21*x^2*y 
+                    + p12*x*y^2 + p03*y^3 + p40*x^4 + p31*x^3*y + p22*x^2*y^2 
+                    + p13*x*y^3 + p04*y^4
+     Coefficients (with 95% confidence bounds):
+       p00 =   9.991e-05  (9.886e-05, 0.000101)
+       p10 =       4e+11  (2.392e+11, 5.608e+11)
+       p01 =   -0.001938  (-0.00204, -0.001837)
+       p20 =  -2.356e+14  (-3.25e+14, -1.462e+14)
+       p11 =  -1.163e+12  (-4.14e+12, 1.815e+12)
+       p02 =   -0.001633  (-0.005214, 0.001948)
+       p30 =   1.684e+15  (-1.382e+16, 1.719e+16)
+       p21 =   8.719e+14  (-1.361e+15, 3.105e+15)
+       p12 =       0.804  (0.1193, 1.489)
+       p03 =     0.01259  (-0.03783, 0.063)
+       p40 =   8.053e+18  (3.213e+18, 1.289e+19)
+       p31 =  -1.453e+17  (-5.175e+17, 2.269e+17)
+       p22 =     -0.8057  (-81.37, 79.76)
+       p13 =      -5.904  (-9.805, -2.003)
+       p04 =   -0.004945  (-0.2506, 0.2407)
+           sse: 9.0319e-11
+       rsquare: 0.9998
+           dfe: 156
+    adjrsquare: 0.9997
+          rmse: 7.6090e-07
+
+Iw=6.96e+12
+Model poly44 for file warping-rectangle-100-4-171.csv rejected, Iw=6.96e+12>1.47e-11
 ```
 ![image](https://github.com/simo-11/section-properties/assets/1210784/7dd79516-126c-4dee-be22-dfe763fa7476)
 
