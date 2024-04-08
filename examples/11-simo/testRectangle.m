@@ -2,7 +2,7 @@ function [c]=testRectangle(ao)
 arguments
     ao.height=100
     ao.width=100
-    ao.models=["cubicinterp","poly44"]
+    ao.models=["cubicinterp","poly44","sinhs"]
     ao.debugLevel=0
     ao.plot=1
 end
@@ -14,6 +14,8 @@ list=dir(fp);
 n=size(list,1);
 c=cell(n,1);
 ms=size(ao.models,2);
+H=ao.height/1000;
+W=ao.width/1000;
 for i=1:n
     fn=list(i).name;
     if ao.debugLevel>0
@@ -32,6 +34,19 @@ for i=1:n
     for mi=1:ms
         model=ao.models(mi);
         switch model
+            case "sinhs"
+            if ao.debugLevel>1
+                fprintf("Expected coefficient values for sinhs:\n");
+                fprintf("x0=%.3g, y0=%.3g\n",...
+                    W/2,H/2);
+                fprintf("c1=%.3g, c3=%.3g, c5=%.3g\n",...
+                    rwcn(1,H,W),rwcn(3,H,W),rwcn(5,H,W));
+            end
+                ft=fittype(@(x0,y0,c1,c3,c5,x,y) ...
+                    sinhs(x0,y0,c1,c3,c5,x,y,H),...
+                    coefficients={'x0','y0','c1','c3','c5'},...
+                    independent={'x','y'},...
+                    dependent='w');
             otherwise
             ft=model;
         end
@@ -41,7 +56,7 @@ for i=1:n
         [f,gof,output,warnstr,errstr,convmsg]=...
             fit([t.x t.y],t.w,ft); %#ok<ASGLU>
         w=@(x,y)f(x,y).^2;
-        Iw=integral2(w,0,ao.width/1000,0,ao.height/1000);
+        Iw=integral2(w,0,W,0,H);
         if ao.debugLevel>1
             disp(f);
             disp(gof);
