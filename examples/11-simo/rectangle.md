@@ -80,6 +80,37 @@ Reads all files selected by rectangle dimensions and performs cubicinterp and po
 ```
 ![image](https://github.com/simo-11/section-properties/assets/1210784/0d7dee0b-3db8-4541-8883-41deed27b57b)
 
+Checking parameters for models providing them.
+Comments after --
+```
+>> w=testRectangle(debugLevel=2,models=["poly44"],plot=0);
+file=warping-rectangle-100-100-357.csv
+x values: 0 - 0.1
+y values: 0 - 0.1
+w values: -0.000366 - 0.000366
+model=poly44
+     Linear model Poly44:
+     f(x,y) = p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p02*y^2 + p30*x^3 + p21*x^2*y 
+                    + p12*x*y^2 + p03*y^3 + p40*x^4 + p31*x^3*y + p22*x^2*y^2 
+                    + p13*x*y^3 + p04*y^4
+     Coefficients (with 95% confidence bounds):
+       p00 =   1.644e-07  (-6.632e-06, 6.961e-06) -- not important <0.001*w  
+       p10 =    -0.03778  (-0.03834, -0.03721) -- important, transforms origin
+       p01 =     0.03776  (0.0372, 0.03833) -- important, transforms origin
+       p20 =       1.134  (1.115, 1.153) -- important 
+       p11 =  -0.0001405  (-0.0147, 0.01442) -- not important <0.003*w
+       p02 =      -1.133  (-1.152, -1.114) -- important
+       p30 =      -7.564  (-7.828, -7.3) -- important
+       p21 =      -22.67  (-22.86, -22.47) -- important
+       p12 =       22.67  (22.47, 22.86) -- important
+       p03 =       7.548  (7.282, 7.815) -- important
+       p40 =     0.04689  (-1.232, 1.325) -- not important
+       p31 =       151.1  (150, 152.2) -- important
+       p22 =     0.02697  (-1.039, 1.093) -- not important
+       p13 =      -151.1  (-152.2, -150) -- important
+       p04 =     0.03326  (-1.261, 1.327) -- not important
+```
+
 ## 100-10
 Iw should be about 6.6e-12
 
