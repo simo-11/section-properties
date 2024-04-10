@@ -25,7 +25,8 @@ Create surface fit to data provided by csv files using Curve fitting toolbox
  * cubicinterp - Cubic spline interpolation
  * poly44 - polynomial surfaces where i is the degree in x and j is the degree in y. The maximum for both i and j is five. For rectangle 44 gives quite good results.
  * anonymous function - see fittype for details
-   * test process by using known analytical solution https://en.wikiversity.org/wiki/Warping_functions#Example_3:_Rectangular_Cylinder for few lowest values of n  
+   * sinhs (sinh series) test process by using known analytical solution https://www.researchgate.net/publication/361446204_Efficient_modeling_and_order_reduction_of_new_3D_beam_elements_with_warping_via_absolute_nodal_coordinate_formulation
+     (or https://en.wikiversity.org/wiki/Warping_functions#Example_3:_Rectangular_Cylinder) for few lowest values of n  
 
 using 41 node function as input to cubicinterp produces reasonable approximation and recalculated value of Iw is about 8 % too high
 ```
