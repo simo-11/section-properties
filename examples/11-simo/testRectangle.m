@@ -72,6 +72,17 @@ c5*sin(5*pi*(y-y0)/H).*sinh(5*pi*(x-x0)/H),...
             disp(gof);
             fprintf("Iw=%.3g\n",Iw);
         end
+        if ao.plot
+            s=sprintf("%s for %s",model,fn);
+            figure('Name',s);
+            plot(f,[t.x t.y],t.w);
+            axis equal;
+            ax=gca;
+            dz=(max(t.w)-min(t.w))/min([max(t.x) max(t.y)]);
+            ax.DataAspectRatio=[1 1 dz];
+            s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
+            title(s);
+        end
         if (Iw>maxIw)  || (gof.rsquare<ao.rsquareMin)
             fprintf(['Model %s for file %s rejected,'...
                 ' Iw=%.3g, max=%.3g'...
@@ -89,17 +100,6 @@ c5*sin(5*pi*(y-y0)/H).*sinh(5*pi*(x-x0)/H),...
         eval(es);
         es=sprintf("o.%s_output=output;",model);
         eval(es);
-        if ao.plot
-            s=sprintf("%s for %s",model,fn);
-            figure('Name',s);
-            plot(f,[t.x t.y],t.w);
-            axis equal;
-            ax=gca;
-            dz=max(t.w)/min([max(t.x) max(t.y)]);
-            ax.DataAspectRatio=[1 1 dz];
-            s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
-            title(s);
-        end
     end
     c{i}=o;
 end
