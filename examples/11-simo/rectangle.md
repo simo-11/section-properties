@@ -114,6 +114,13 @@ model=poly44
        p04 =     0.03326  (-1.261, 1.327) -- not important
 ```
 
+### sinh series with various numbers of n
+![image](https://github.com/simo-11/section-properties/assets/1210784/ce6fd20c-cd56-4385-8753-74d2c95f5f45)
+
+![image](https://github.com/simo-11/section-properties/assets/1210784/fb15f3f0-07b0-4815-a59e-6a73236e3940)
+
+![image](https://github.com/simo-11/section-properties/assets/1210784/e42e64af-48b2-412f-b412-cf58422712e1)
+
 ## 100-10
 Iw should be about 6.6e-12
 
