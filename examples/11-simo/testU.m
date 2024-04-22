@@ -1,18 +1,20 @@
-function [c]=testRectangle(ao)
+function [c]=testU(ao)
 arguments
     ao.height=100
-    ao.width=100
-    ao.models=["cubicinterp","poly44","sinhs4"]
+    ao.width=50
+    ao.t=4
+    ao.r=0
+    ao.r_n=0
+    ao.models=["cubicinterp","poly44","sinhs"]
     ao.debugLevel=0
     ao.plot=0
     ao.rsquareMin=0.9
-    ao.n="*"
 end
 %{
 Test warping function fit using csv files in gen directory
 %}
-fp=sprintf("gen/warping-rectangle-%g-%g-%s.csv",...
-    ao.height,ao.width,ao.n);
+fp=sprintf("gen/warping-cold-formed-u-%g-%g-%g-%g-%g-*.csv",...
+    ao.height,ao.width,ao.t,ao.r,ao.r_n);
 list=dir(fp);
 n=size(list,1);
 c=cell(n,1);
@@ -21,7 +23,9 @@ H=ao.height/1000;
 W=ao.width/1000;
 for i=1:n
     fn=list(i).name;
-    fprintf("file=%s\n",fn);
+    if ao.debugLevel>0
+        fprintf("file=%s\n",fn);
+    end
     file=sprintf("%s/%s",list(i).folder,fn);
     t=readtable(file);
     if ao.debugLevel>1
@@ -35,12 +39,6 @@ for i=1:n
     for mi=1:ms
         model=ao.models(mi);
         switch model
-            case "t1"
-                ft=fittype(@(x0,y0,c1,c3,c5,x,y) ...
-(x-x0).*(y-y0)+c1*x+c3*y+c5*x,...
-                    coefficients={'x0','y0','c1','c3','c5'},...
-                    independent={'x','y'},...
-                    dependent='w');
             otherwise
             if startsWith(model,"sinhs")
                 n=str2double(extract(model,digitsPattern));
@@ -60,10 +58,10 @@ for i=1:n
             fit([t.x t.y],t.w,ft); %#ok<ASGLU>
         w=@(x,y)f(x,y).^2;
         Iw=integral2(w,0,W,0,H);
-        fprintf("model=%s, Iw=%.3g\n",model,Iw);
         if ao.debugLevel>1
             disp(f);
             disp(gof);
+            fprintf("Iw=%.3g\n",Iw);
         end
         if ao.plot
             s=sprintf("%s for %s",model,fn);

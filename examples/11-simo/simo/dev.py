@@ -180,6 +180,160 @@ class DevSection(Section):
             writer.writerow(['f','s','t'])
             writer.writerows(rows)
         print("Wrote {0}".format(fn))
+        
+    def write_warping_gltf(self,fn=None):
+        if fn==None:
+            fn=self.default_filename(suffix='.glb',use_case='warping')
+        ps=len(self._mesh_nodes)
+        points=np.empty((ps,3),dtype="float32")
+        points[:,0]=self._mesh_nodes[:,0]
+        points[:,1]=self._mesh_nodes[:,1]
+        points[:,2]=self.section_props.omega
+        triangles=self.get_triangles()
+        triangles_binary_blob = triangles.flatten().tobytes()
+        points_binary_blob = points.tobytes()
+        n_times=31
+        d=n_times-1
+        times=np.empty(n_times,dtype="float32")
+        scales=np.ones((n_times,3),dtype="float32")
+        scaler=0.4*self.get_box_aspect()[2]/max(self.section_props.omega)
+        for i in range(0,n_times):
+            times[i]=i
+            scales[i,2]=math.sin(times[i]/d*2*math.pi)*scaler
+        flat_scales=np.ones((n_times,3),dtype="float32")
+        flat_scales[:,2]=0
+        times_blob=times.tobytes()
+        scales_blob=scales.tobytes()
+        gltf = pygltflib.GLTF2(
+        scene=0,
+        scenes=[pygltflib.Scene(nodes=[0])],
+        nodes=[pygltflib.Node(children=[1,2])
+               ,pygltflib.Node(mesh=0,name="cross-section with warping")
+               ,pygltflib.Node(mesh=1,name="undeformed cross-section",
+                               scale=[1,1,0])
+               ],
+        meshes=[
+            pygltflib.Mesh(
+                primitives=[
+                    pygltflib.Primitive(
+                        attributes=pygltflib.Attributes(POSITION=1),
+                        indices=0,
+                        material=0
+                    )])
+            ,pygltflib.Mesh(
+                primitives=[
+                    pygltflib.Primitive(
+                        attributes=pygltflib.Attributes(POSITION=1),
+                        indices=0,
+                        material=1
+                    )])
+        ],
+        materials=[
+            pygltflib.Material(pbrMetallicRoughness=
+                               pygltflib.PbrMetallicRoughness(
+                                   baseColorFactor=[0.2,0.2,0.2,0.85]),
+                               doubleSided=True,
+                               alphaCutoff=None,
+                               name='cross-section with warping',
+                               alphaMode='BLEND')
+            ,pygltflib.Material(pbrMetallicRoughness=
+                               pygltflib.PbrMetallicRoughness(
+                                   baseColorFactor=[0.5,0.1,0.1,0.]),
+                               doubleSided=True,
+                               alphaCutoff=None,
+                               name='undeformed cross-section',
+                               alphaMode='OPAQUE')
+        ],
+        accessors=[
+            pygltflib.Accessor(
+                bufferView=0,
+                componentType=pygltflib.UNSIGNED_SHORT,
+                count=triangles.size,
+                type=pygltflib.SCALAR,
+                max=[int(triangles.max())],
+                min=[int(triangles.min())],
+            ),
+            pygltflib.Accessor(
+                bufferView=1,
+                componentType=pygltflib.FLOAT,
+                count=len(points),
+                type=pygltflib.VEC3,
+                max=points.max(axis=0).tolist(),
+                min=points.min(axis=0).tolist(),
+            ),
+            pygltflib.Accessor(
+                bufferView=2,
+                componentType=pygltflib.FLOAT,
+                count=n_times,
+                type=pygltflib.SCALAR,
+                max=[times.max().item()],
+                min=[0],
+            ),
+            pygltflib.Accessor(
+                bufferView=3,
+                componentType=pygltflib.FLOAT,
+                count=n_times,
+                type=pygltflib.VEC3,
+                max=scales.max(axis=0).tolist(),
+                min=scales.min(axis=0).tolist(),
+            ),
+        ],
+        bufferViews=[
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(triangles_binary_blob),
+                target=pygltflib.ELEMENT_ARRAY_BUFFER,
+                name='triangles',
+            ),
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(points_binary_blob),
+                byteOffset=len(triangles_binary_blob),
+                target=pygltflib.ARRAY_BUFFER,
+                name='points',
+            ),
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(times_blob),
+                byteOffset=len(triangles_binary_blob)
+                    +len(points_binary_blob)
+                ,name='times',
+            ),
+            pygltflib.BufferView(
+                buffer=0,
+                byteLength=len(scales_blob),
+                byteOffset=len(triangles_binary_blob)
+                    +len(points_binary_blob)
+                    +len(times_blob)
+                ,name='scales',
+            ),
+        ],
+        buffers=[
+            pygltflib.Buffer(byteLength=len(triangles_binary_blob)
+                             +len(points_binary_blob)
+                             +len(times_blob)
+                             +len(scales_blob)
+                             )
+        ],
+        animations=[
+            pygltflib.Animation(name="warping",
+                                channels=[pygltflib.AnimationChannel(
+                                    sampler=0,
+                                    target=pygltflib.AnimationChannelTarget(
+                                        node=0,path='scale')
+                                    )],
+                                samplers=[pygltflib.AnimationSampler(
+                                    input=2,output=3),
+                                    ]),
+        ]
+        )
+        gltf.set_binary_blob(triangles_binary_blob + points_binary_blob+
+                             times_blob+scales_blob)
+        #
+        #
+        gfn=self.gfn(fn)
+        gltf.save(gfn)
+        print("Wrote {0}".format(fn))
 
     def done(self,ms,itDiff,iwDiff):
         if self.args.mesh_size:
