@@ -11,6 +11,7 @@ import numpy as np
 import csv
 import math
 import matplotlib.pyplot as plt
+from plyfile import PlyData, PlyElement
 
 RECTANGLE='rectangle'
 CIRCULAR='circular'
@@ -334,6 +335,26 @@ class DevSection(Section):
         gfn=self.gfn(fn)
         gltf.save(gfn)
         print("Wrote {0}".format(fn))
+
+    def write_warping_ply(self,fn=None):
+        if fn==None:
+            fn=self.default_filename(suffix='.ply',use_case='warping')
+        ps=len(self._mesh_nodes)
+        points=np.empty(ps*3,dtype=[('x', 'f4'), ('y', 'f4'),
+                            ('z', 'f4')])
+        scaler=0.4*self.get_box_aspect()[2]/max(self.section_props.omega)
+        np.put(points,np.arange(0,ps*3,3),self._mesh_nodes[:,0])
+        np.put(points,np.arange(1,ps*3,3),self._mesh_nodes[:,1])
+        np.put(points,np.arange(2,ps*3,3),scaler*self.section_props.omega)
+        face=np.array(self.get_triangles(),
+                      dtype=[('vertex_indices', 'uint16', (3,))])
+        el = PlyElement.describe(points, 'vertex',
+                                 face,'face',
+                                 comments=['simo.dev.write_warping_ply'])
+        gfn=self.gfn(fn)
+        PlyData([el], text=True).write(gfn);
+        print("Wrote {0}".format(fn))
+
 
     def done(self,ms,itDiff,iwDiff):
         if self.args.mesh_size:

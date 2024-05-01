@@ -5,6 +5,11 @@ Created on Wed Apr 24 20:36:28 2024
 @author: simon
 using Copilot base on task
 implement TPS in Python
+See also
+https://grass.osgeo.org/
+https://github.com/OSGeo/grass-addons/tree/grass8/src/vector/v.surf.tps
+https://se.mathworks.com/matlabcentral/fileexchange/37576-3d-thin-plate-spline-warping-function
+https://github.com/topinfrassi01/3d-deformation-algorithms/blob/main/numpy/tps3d.py
 """
 
 import numpy as np
@@ -51,15 +56,14 @@ control_z = np.array([0, 1, 4, 9, 16])
 tps = thin_plate_spline(control_x, control_y, control_z, lambda_smooth=0.1)
 
 # Evaluate TPS at new points
-new_x = np.linspace(0, 4, 100)
-new_y = np.linspace(0, 4, 100)
-X, Y = np.meshgrid(new_x, new_y)
-Z = tps(X, Y)
+x = np.linspace(0, 4, 5)
+y = np.linspace(0, 4, 5)
+z = tps(x, y)
 
 # Plot control points and deformed surface
 plt.figure(figsize=(8, 6))
 plt.scatter(control_x, control_y, c='red', label='Control Points')
-plt.contourf(X, Y, Z, levels=20, cmap='viridis', alpha=0.7)
+plt.contourf(x, y, z, levels=20, cmap='viridis', alpha=0.7)
 plt.colorbar(label='Deformed Value')
 plt.xlabel('X')
 plt.ylabel('Y')
