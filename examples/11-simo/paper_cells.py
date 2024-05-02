@@ -9,7 +9,7 @@ run and also debug cells if needed.
 """
 # %% rectangle 100-100
 import matplotlib.pyplot as plt
-mesh_sizes=(0.01,3e-4, 1e-4, 3e-5)
+mesh_sizes=(0.01,)#,3e-4, 1e-4, 3e-5)
 n=len(mesh_sizes)
 for i in range(0, n):
     section=None
