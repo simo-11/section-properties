@@ -347,14 +347,17 @@ class DevSection(Section):
                scaler*self.section_props.omega[i]) for i in range(ps)]
         points=np.array(data,dtype=[('x', 'f4'), ('y', 'f4'),
                             ('z', 'f4')])
-        face=np.array(self.get_triangles(),
-                      dtype=[('vertex_indices', 'uint16', (3,))])
-        el = PlyElement.describe(points, 'vertex')
-        el = PlyElement.describe(face,'face',
+        face=self.get_triangles()
+        face_data=[(([face[i,0],
+               face[i,1],
+               face[i,2]],)) for i in range(len(face))]
+        faces=np.array(face_data,dtype=[('vertex_indices', 'i2', (3,))])
+        ply_nodes = PlyElement.describe(points, 'vertex')
+        ply_elements = PlyElement.describe(faces,'face',
                                  comments=['simo.dev.write_warping_ply'])
         
         gfn=self.gfn(fn)
-        PlyData([el], text=True).write(gfn);
+        PlyData([ply_nodes,ply_elements], text=True).write(gfn);
         print("Wrote {0}".format(fn))
 
 
