@@ -340,7 +340,6 @@ class DevSection(Section):
         if fn==None:
             fn=self.default_filename(suffix='.ply',use_case='warping')
         scaler=0.4*self.get_box_aspect()[2]/max(self.section_props.omega)
-        scaler=1
         ps=len(self._mesh_nodes)
         data=[(self._mesh_nodes[i,0],
                self._mesh_nodes[i,1],
@@ -351,13 +350,14 @@ class DevSection(Section):
         face_data=[(([face[i,0],
                face[i,1],
                face[i,2]],)) for i in range(len(face))]
-        faces=np.array(face_data,dtype=[('vertex_indices', 'i2', (3,))])
+        # use int as e.g. gigamesh reader does not support shorts
+        faces=np.array(face_data,dtype=[('vertex_indices', 'int', (3,))])
         ply_nodes = PlyElement.describe(points, 'vertex')
         ply_elements = PlyElement.describe(faces,'face',
                                  comments=['simo.dev.write_warping_ply'])
         
         gfn=self.gfn(fn)
-        PlyData([ply_nodes,ply_elements], text=True).write(gfn);
+        PlyData([ply_nodes,ply_elements], text=False).write(gfn);
         print("Wrote {0}".format(fn))
 
 
