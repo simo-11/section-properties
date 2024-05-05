@@ -109,7 +109,7 @@ class DevSection(Section):
         z=self.section_props.omega
         trictr = ax.tricontourf(x, y, triangles, z,levels=levels)
         fig.colorbar(trictr, label="Warping", format="%.4g")
-        title=('{2}, {0} nodes, {1} elements'.format
+        title=('{2}\n{0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements),self.args.title))
         ax.set_title(title)
         return (fig,ax)
