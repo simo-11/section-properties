@@ -82,7 +82,7 @@ class DevSection(Section):
         z=min(self.args.width,self.args.height)*self.args.z_scale
         return (self.args.width,self.args.height,z)
 
-    def plot_warping_values(self):
+    def plot_warping_values(self,title=None):
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
         ax.set_box_aspect(self.get_box_aspect())
         x=self._mesh_nodes[:,0]
@@ -90,14 +90,18 @@ class DevSection(Section):
         z=self.section_props.omega
         triangles=self.get_triangles()
         ax.plot_trisurf(x, y,triangles, z)
-        title=('{2}, {0} nodes, {1} elements'.format
+        if title==None:
+            title=('{2}, {0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements),self.args.title))
         ax.set_title(title)
         xticks=np.linspace(min(x),max(x),3)
         ax.set_xticks(xticks)
+        yticks=np.linspace(min(y),max(y),3)
+        ax.set_yticks(yticks)
         zticks=np.linspace(min(self.section_props.omega),
                            max(self.section_props.omega),3)
-        ax.set_zticks(zticks)
+        ax.set_zticks(zticks,labels=
+                      ['','0',f'{zticks[2]:2.2}'])
         return (fig,ax)
 
     def contour_warping_values(self, levels=9):
