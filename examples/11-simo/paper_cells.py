@@ -30,20 +30,19 @@ for h in (100,80,60,30,10,2):
                 ,filename=fn)
             print(f'Wrote {fn}')
             gPlotDone=True
-        (fig,ax)=section.contour_warping_values(levels=51)
+        (fig,ax)=section.contour_warping_values(levels=51,title='')
         fn=section.gfn(section.default_filename(".pdf","contour"))
         plt.savefig(fn)
         print(f'Wrote {fn}')
         plt.show();
         (fig,ax)=section.plot_warping_values(title='')
         fn=section.gfn(section.default_filename(".pdf","3d"))
-        plt.savefig(fn)
+        plt.savefig(fn,bbox_inches='tight')
         print(f'Wrote {fn}')
         plt.show();
         section.write_warping_csv()
         section.write_warping_gltf()
         section.write_warping_ply()
-    nv=section.get_gamma()
 # %% swxy
 import matplotlib.pyplot as plt
 import numpy as np
@@ -83,7 +82,53 @@ fn='gen/swxy.pdf'
 plt.savefig(fn)
 print(f'Wrote {fn}')
 plt.show()        
-
-
-
+# %% U and SHS
+import matplotlib.pyplot as plt
+for p in ("rhs","u"):
+    for r in ("s","r"):
+        if r=="s":
+            n_r=0
+        else:
+            n_r=8
+        match p:
+            case "rhs":
+                script="primitive"
+                primitive=f"--primitive {p}"
+                h=150
+                w=h
+                t=8
+                ms=1e-5
+            case "u":
+                script="cold-formed-u"
+                primitive=""
+                h=100
+                w=50
+                t=4
+                ms=1e-4            
+        runfile(f'{script}.py',#noqa
+          args=f"""-A -W={w/1000} -H={h/1000} --thickness={t/1000}
+          --mesh_size={ms}
+          {primitive} --n_r={n_r}""")
+        pdf=plt.figure()
+        fn=section.gfn(section.default_filename(".pdf","geometry"))
+        section.geometry.plot_geometry(
+            labels=()
+            ,title=f"{p}-{r} {w}x{h}x{t} mm"
+            ,cp=False
+            ,legend=False
+            ,filename=fn)
+        print(f'Wrote {fn}')
+        (fig,ax)=section.contour_warping_values(levels=51, title='')
+        fn=section.gfn(section.default_filename(".pdf","contour"))
+        plt.savefig(fn)
+        print(f'Wrote {fn}')
+        plt.show();
+        (fig,ax)=section.plot_warping_values(title='')
+        fn=section.gfn(section.default_filename(".pdf","3d"))
+        plt.savefig(fn,bbox_inches='tight')
+        print(f'Wrote {fn}')
+        plt.show();
+        section.write_warping_csv()
+        section.write_warping_gltf()
+        section.write_warping_ply()
 

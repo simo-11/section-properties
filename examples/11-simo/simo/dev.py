@@ -104,7 +104,7 @@ class DevSection(Section):
                       ['','0',f'{zticks[2]:2.2}'])
         return (fig,ax)
 
-    def contour_warping_values(self, levels=9):
+    def contour_warping_values(self, title=None,levels=9):
         fig, ax = plt.subplots()
         self.set_box_aspect(ax)
         x=self._mesh_nodes[:,0]
@@ -113,7 +113,8 @@ class DevSection(Section):
         z=self.section_props.omega
         trictr = ax.tricontourf(x, y, triangles, z,levels=levels)
         fig.colorbar(trictr, label="Warping", format="%.4g")
-        title=('{2}\n{0} nodes, {1} elements'.format
+        if title==None:
+            title=('{2}\n{0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements),self.args.title))
         ax.set_title(title)
         return (fig,ax)
