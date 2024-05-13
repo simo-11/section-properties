@@ -82,14 +82,16 @@ class DevSection(Section):
         z=min(self.args.width,self.args.height)*self.args.z_scale
         return (self.args.width,self.args.height,z)
 
-    def plot_warping_values(self,title=None):
+    def plot_warping_values(self,title=None,cmap=None):
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
         ax.set_box_aspect(self.get_box_aspect())
         x=self._mesh_nodes[:,0]
         y=self._mesh_nodes[:,1]
         z=self.section_props.omega
         triangles=self.get_triangles()
-        ax.plot_trisurf(x, y,triangles, z)
+        if cmap==None:
+            cmap=plt.cm.seismic
+        ax.plot_trisurf(x, y,triangles, z, cmap=cmap)
         if title==None:
             title=('{2}, {0} nodes, {1} elements'.format
             (self.num_nodes,len(self.elements),self.args.title))
@@ -104,14 +106,16 @@ class DevSection(Section):
                       ['','0',f'{zticks[2]:2.2}'])
         return (fig,ax)
 
-    def contour_warping_values(self, title=None,levels=9):
+    def contour_warping_values(self, title=None,levels=None,cmap=None):
         fig, ax = plt.subplots()
         self.set_box_aspect(ax)
         x=self._mesh_nodes[:,0]
         y=self._mesh_nodes[:,1]
         triangles=self.get_triangles()
         z=self.section_props.omega
-        trictr = ax.tricontourf(x, y, triangles, z,levels=levels)
+        if cmap==None:
+            cmap=plt.cm.seismic
+        trictr = ax.tricontourf(x, y, triangles, z,levels=levels,cmap=cmap)
         fig.colorbar(trictr, label="Warping", format="%.4g")
         if title==None:
             title=('{2}\n{0} nodes, {1} elements'.format
