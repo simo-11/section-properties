@@ -2,7 +2,7 @@ function [c]=testRectangle(ao)
 arguments
     ao.height=100
     ao.width=100
-    ao.models=["cubicinterp","poly44","sinhs4"]
+    ao.models=["cubicinterp","poly44","sinhs4","tps"]
     ao.debugLevel=0
     ao.plot=0
     ao.rsquareMin=0.9
@@ -36,6 +36,7 @@ for i=1:n
         model=ao.models(mi);
         switch model
             case "t1"
+                fitMethod='fit';
                 ft=fittype(@(x0,y0,c1,c3,c5,x,y) ...
 (x-x0).*(y-y0)+c1*x+c3*y+c5*x,...
                     coefficients={'x0','y0','c1','c3','c5'},...
@@ -49,6 +50,9 @@ for i=1:n
                     coefficients={'x0','y0'},...
                     independent={'x','y'},...
                     dependent='w');
+                fitMethod='fit';
+            elseif startsWith(model,"tps")
+                fitMethod='tpaps';
             else  
                 ft=model;
             end
@@ -56,9 +60,23 @@ for i=1:n
         if ao.debugLevel>0
             fprintf("model=%s\n",model);
         end
-        [f,gof,output,warnstr,errstr,convmsg]=...
-            fit([t.x t.y],t.w,ft); %#ok<ASGLU>
-        w=@(x,y)f(x,y).^2;
+        switch fitMethod
+            case 'fit'
+                [f,gof,output,warnstr,errstr,convmsg]=...
+                    fit([t.x t.y],t.w,ft); %#ok<ASGLU>
+                w=@(x,y)f(x,y).^2;
+            case 'tpaps'
+                if strlength(model)>3
+                    pin=str2double(extractAfter(model,3));
+                    f=tpaps([t.x t.y]',t.w',pin);
+                else
+                    [f,pout]=tpaps([t.x t.y]',t.w');
+                    if ao.debugLevel>0
+                        fprintf("pout=%.3g\n",pout);
+                    end
+                end
+                w=@(x,y)fnval(f,[x y]).^2;
+        end
         Iw=integral2(w,0,W,0,H);
         fprintf("model=%s, Iw=%.3g\n",model,Iw);
         if ao.debugLevel>1
