@@ -64,6 +64,13 @@ for i=1:n
             case 'fit'
                 [f,gof,output,warnstr,errstr,convmsg]=...
                     fit([t.x t.y],t.w,ft); %#ok<ASGLU>
+                if (gof.rsquare<ao.rsquareMin)
+                    fprintf(['Model %s for file %s rejected,'...
+                    ' rsquare=%.3g, min=%.3g\n'],...
+                    model,fn,...
+                    gof.rsquare,ao.rsquareMin);
+                    continue;
+                end                
                 w=@(x,y)f(x,y).^2;
             case 'tpaps'
                 if strlength(model)>3
@@ -75,7 +82,8 @@ for i=1:n
                         fprintf("pout=%.3g\n",pout);
                     end
                 end
-                w=@(x,y)fnval(f,[x y]).^2;
+                w=@(x,y)reshape(fnval(f,[x(:)';y(:)']).^2,...
+                    size(x,1),[]);
         end
         Iw=integral2(w,0,W,0,H);
         fprintf("model=%s, Iw=%.3g\n",model,Iw);
@@ -86,31 +94,41 @@ for i=1:n
         if ao.plot
             s=sprintf("%s for %s",model,fn);
             figure('Name',s);
-            plot(f,[t.x t.y],t.w);
+            switch fitMethod
+                case 'fit'
+                plot(f,[t.x t.y],t.w);
+                s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
+                title(s);
+                case 'tpaps'
+                xy=[t.x' t.y'];
+                tpsvals=fnval(f,xy);
+                plot3(t.x, t.y,tpsvals);
+                s=sprintf("Iw=%.3g using %s",Iw,model);
+                title(s);
+            end
             axis equal;
             ax=gca;
             dz=(max(t.w)-min(t.w))/min([max(t.x) max(t.y)]);
             ax.DataAspectRatio=[1 1 dz];
-            s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
-            title(s);
         end
-        if (Iw>maxIw)  || (gof.rsquare<ao.rsquareMin)
+        if (Iw>maxIw)
             fprintf(['Model %s for file %s rejected,'...
-                ' Iw=%.3g, max=%.3g'...
-                ' rsquare=%.3g, min=%.3g\n'],...
-                model,fn,...
-                Iw,maxIw,...
-                gof.rsquare,ao.rsquareMin);
+            ' Iw=%.3g, max=%.3g'],...
+            model,fn,...
+            Iw,maxIw);
             continue;
         end
         es=sprintf("o.%s_Iw=Iw;",model);
         eval(es);
         es=sprintf("o.%s_fit=f;",model);
         eval(es);
-        es=sprintf("o.%s_gof=gof;",model);
-        eval(es);
-        es=sprintf("o.%s_output=output;",model);
-        eval(es);
+        switch fitMethod
+            case 'fit'
+            es=sprintf("o.%s_gof=gof;",model);
+            eval(es);
+            es=sprintf("o.%s_output=output;",model);
+            eval(es);
+        end
     end
     c{i}=o;
 end
