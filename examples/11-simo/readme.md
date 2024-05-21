@@ -101,7 +101,7 @@ TO=triangulation(T,t.x,t.y,t.w);
 trisurf(TO)
 axis equal;
 ```
-Or using ancf-rhs\cross-section\show_section
+Or using show_section
 ```
 show_section('USection','100x50x4-8-4-267');
 ```
