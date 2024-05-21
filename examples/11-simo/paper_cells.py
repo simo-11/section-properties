@@ -41,6 +41,7 @@ for h in (100,80,60,30,10,2):
         print(f'Wrote {fn}')
         plt.show();
         section.write_warping_csv()
+        section.write_triangles_csv()
         section.write_warping_gltf()
         section.write_warping_ply()
 # %% swxy

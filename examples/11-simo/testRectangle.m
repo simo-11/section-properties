@@ -34,28 +34,18 @@ for i=1:n
     o.file=file;
     for mi=1:ms
         model=ao.models(mi);
-        switch model
-            case "t1"
-                fitMethod='fit';
-                ft=fittype(@(x0,y0,c1,c3,c5,x,y) ...
-(x-x0).*(y-y0)+c1*x+c3*y+c5*x,...
-                    coefficients={'x0','y0','c1','c3','c5'},...
-                    independent={'x','y'},...
-                    dependent='w');
-            otherwise
-            if startsWith(model,"sinhs")
-                n=str2double(extract(model,digitsPattern));
-                ft=fittype(@(x0,y0,x,y) ...
-                    rect_psi(x,y,x0,y0,n,W/2,H/2),...
-                    coefficients={'x0','y0'},...
-                    independent={'x','y'},...
-                    dependent='w');
-                fitMethod='fit';
-            elseif startsWith(model,"tps")
-                fitMethod='tpaps';
-            else  
-                ft=model;
-            end
+        fitMethod='fit';
+        if startsWith(model,"sinhs")
+            n=str2double(extract(model,digitsPattern));
+            ft=fittype(@(x0,y0,x,y) ...
+                rect_psi(x,y,x0,y0,n,W/2,H/2),...
+                coefficients={'x0','y0'},...
+                independent={'x','y'},...
+                dependent='w');
+        elseif startsWith(model,"tps")
+            fitMethod='tpaps';
+        else  
+            ft=model;
         end
         if ao.debugLevel>0
             fprintf("model=%s\n",model);
@@ -100,11 +90,7 @@ for i=1:n
                 s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
                 title(s);
                 case 'tpaps'
-                xy=[t.x' t.y'];
-                tpsvals=fnval(f,xy);
-                plot3(t.x, t.y,tpsvals);
-                s=sprintf("Iw=%.3g using %s",Iw,model);
-                title(s);
+                tps_plot(f,list(i),t);
             end
             axis equal;
             ax=gca;
