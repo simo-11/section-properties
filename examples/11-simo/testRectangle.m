@@ -65,13 +65,10 @@ for i=1:n
             case 'tpaps'
                 if strlength(model)>3
                     pin=str2double(extractAfter(model,3));
-                    f=tpaps([t.x t.y]',t.w',pin);
                 else
-                    [f,pout]=tpaps([t.x t.y]',t.w');
-                    if ao.debugLevel>0
-                        fprintf("pout=%.3g\n",pout);
-                    end
+                    pin=1;
                 end
+                f=tpaps([t.x t.y]',t.w',pin);
                 w=@(x,y)reshape(fnval(f,[x(:)';y(:)']).^2,...
                     size(x,1),[]);
         end
@@ -91,6 +88,8 @@ for i=1:n
                 title(s);
                 case 'tpaps'
                 tps_plot(f,list(i),t);
+                s=sprintf("Iw=%.3g",Iw);
+                title(s);
             end
             axis equal;
             ax=gca;
