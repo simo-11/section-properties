@@ -2,7 +2,7 @@ function [c]=testRectangle(ao)
 arguments
     ao.height=100
     ao.width=100
-    ao.models=["cubicinterp","poly44","sinhs4","tps"]
+    ao.models=["poly44","cubicinterp","tps"]
     ao.debugLevel=0
     ao.plot=0
     ao.rsquareMin=0.9
@@ -47,9 +47,6 @@ for i=1:n
         else  
             ft=model;
         end
-        if ao.debugLevel>0
-            fprintf("model=%s\n",model);
-        end
         switch fitMethod
             case 'fit'
                 [f,gof,output,warnstr,errstr,convmsg]=...
@@ -76,7 +73,10 @@ for i=1:n
         fprintf("model=%s, Iw=%.3g\n",model,Iw);
         if ao.debugLevel>1
             disp(f);
-            disp(gof);
+            switch fitMethod
+                case 'fit'
+                disp(gof);
+            end
         end
         if ao.plot
             s=sprintf("%s for %s",model,fn);
