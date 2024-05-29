@@ -3,6 +3,7 @@ arguments
     ao.height=100
     ao.width=100
     ao.models=["poly44","cubicinterp","tps"]
+    ao.cubs=["integral2"]
     ao.debugLevel=0
     ao.plot=0
     ao.rsquareMin=0.9
@@ -17,6 +18,7 @@ list=dir(fp);
 n=size(list,1);
 c=cell(n,1);
 ms=size(ao.models,2);
+cs=size(ao.cubs,2);
 H=ao.height/1000;
 W=ao.width/1000;
 for i=1:n
@@ -62,8 +64,6 @@ for i=1:n
                 w=@(x,y)reshape(fnval(f,[x(:)';y(:)']).^2,...
                     size(x,1),[]);
         end
-        Iw=integral2(w,0,W,0,H);
-        fprintf("model=%s, Iw=%.3g\n",model,Iw);
         if ao.debugLevel>1
             disp(f);
             switch fitMethod
@@ -71,41 +71,54 @@ for i=1:n
                 disp(gof);
             end
         end
-        if ao.plot
-            s=sprintf("%s for %s",model,fn);
-            figure('Name',s);
-            switch fitMethod
-                case 'fit'
-                plot(f,[t.x t.y],t.w);
-                s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
-                title(s);
-                case 'tpaps'
-                tps_plot(f,list(i),t);
-                s=sprintf("Iw=%.3g",Iw);
-                title(s);
+        for ci=1:cs
+            cub=ao.cubs(ci);
+            switch cub
+                case 'integral2'
+                Iw=integral2(w,0,W,0,H);
+                otherwise
+                    fprintf("cub value %s is not supported\n",cub)
+                    continue;
             end
-            axis equal;
-            ax=gca;
-            dz=(max(t.w)-min(t.w))/min([max(t.x) max(t.y)]);
-            ax.DataAspectRatio=[1 1 dz];
-        end
-        if (Iw>maxIw)
-            fprintf(['Model %s for file %s rejected,'...
-            ' Iw=%.3g, max=%.3g'],...
-            model,fn,...
-            Iw,maxIw);
-            continue;
-        end
-        es=sprintf("o.%s_Iw=Iw;",model);
-        eval(es);
-        es=sprintf("o.%s_fit=f;",model);
-        eval(es);
-        switch fitMethod
-            case 'fit'
-            es=sprintf("o.%s_gof=gof;",model);
+            fprintf("model=%s, cub=%s Iw=%.3g\n",model,cub,Iw);
+            if ao.plot && ci==1
+                s=sprintf("%s for %s",model,fn);
+                figure('Name',s);
+                switch fitMethod
+                    case 'fit'
+                    plot(f,[t.x t.y],t.w);
+                    s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
+                    title(s);
+                    case 'tpaps'
+                    tps_plot(f,list(i),t);
+                    s=sprintf("Iw=%.3g",Iw);
+                    title(s);
+                end
+                axis equal;
+                ax=gca;
+                dz=(max(t.w)-min(t.w))/min([max(t.x) max(t.y)]);
+                ax.DataAspectRatio=[1 1 dz];
+            end
+            if (Iw>maxIw)
+                fprintf(['Model %s using %s for file %s rejected,'...
+                ' Iw=%.3g, max=%.3g'],...
+                model,cub,fn,...
+                Iw,maxIw);
+                continue;
+            end
+            es=sprintf("o.%s_%s_Iw=Iw;",model,cub);
             eval(es);
-            es=sprintf("o.%s_output=output;",model);
-            eval(es);
+            if ci==1
+                es=sprintf("o.%s_fit=f;",model);
+                eval(es);
+                switch fitMethod
+                    case 'fit'
+                    es=sprintf("o.%s_gof=gof;",model);
+                    eval(es);
+                    es=sprintf("o.%s_output=output;",model);
+                    eval(es);
+                end
+            end
         end
     end
     c{i}=o;
