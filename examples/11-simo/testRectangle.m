@@ -35,14 +35,7 @@ for i=1:n
     for mi=1:ms
         model=ao.models(mi);
         fitMethod='fit';
-        if startsWith(model,"sinhs")
-            n=str2double(extract(model,digitsPattern));
-            ft=fittype(@(x0,y0,x,y) ...
-                rect_psi(x,y,x0,y0,n,W/2,H/2),...
-                coefficients={'x0','y0'},...
-                independent={'x','y'},...
-                dependent='w');
-        elseif startsWith(model,"tps")
+        if startsWith(model,"tps")
             fitMethod='tpaps';
         else  
             ft=model;
