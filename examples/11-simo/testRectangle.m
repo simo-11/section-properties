@@ -6,6 +6,8 @@ arguments
     ao.cubs=["integral2"]%["integral2","glaubitz","rbfcub"]
     ao.debugLevel=0
     ao.plot=0
+    ao.scat_type='halton'
+    ao.card=80
     ao.rsquareMin=0.9
     ao.n="*"
 end
@@ -25,8 +27,13 @@ domain.vertices=[0 0; W 0; W H; 0 H; 0 0];
 XV=domain.vertices(:,1);
 YV=domain.vertices(:,2);
 domain.polyshape=polyshape(XV,YV);
+domain.domain='rectangle';
 [xlimit,ylimit]=boundingbox(domain.polyshape);
 domain.dbox=[xlimit; ylimit];
+cao.debugLevel=4;
+[t,dbox,area_domain]=define_scattered_pointset(ao.card,domain,...
+    ao.scat_type); %#ok<ASGLU>
+cao.centers=t;
 for i=1:n
     fn=list(i).name;
     fprintf("file=%s\n",fn);
@@ -79,9 +86,11 @@ for i=1:n
         end
         for ci=1:cs
             cub=ao.cubs(ci);
-            %cao=ao;
-            cao.debugLevel=4;
-            Iw=do_cub(w,domain,cub,cao);    
+            Iw=do_cub(w,domain,cub,cao);
+            if anynan(Iw)
+                fprintf("model=%s, cub=%s failed\n",model,cub);
+                continue;
+            end    
             fprintf("model=%s, cub=%s Iw=%.3g\n",model,cub,Iw);
             if ao.plot && ci==1
                 s=sprintf("%s for %s",model,fn);

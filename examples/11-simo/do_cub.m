@@ -6,9 +6,13 @@ domain=struct with fields
  polyshape
  dbox
  vertices
-cub cubature method
+cub=cubature method
+t=table with columns from section-properties
+ x,y
+ w warping
 ao=argument object struct with fields
- debugLevel int 
+ debugLevel int
+ centers matrix of size ncenters,2
 %}
 arguments
     f
@@ -17,7 +21,7 @@ arguments
     ao
 end
 if ao.debugLevel>3
-    fprintf("cub=%s",cub);
+    fprintf("cub=%s\n",cub);
 end
 switch cub
     case 'integral2'
@@ -27,7 +31,7 @@ switch cub
     case 'glaubitz'
     case 'rbfcub'
         [w, cpus, Vcond , moms , res2 ,phi_str]=...
-            RBF_cub_polygon_OPT(domain.polyshape,t);%#ok<ASGLU>
+            RBF_cub_polygon_OPT(domain.polyshape,ao.centers);%#ok<ASGLU>
         if ao.debugLevel>3
             for i=1:4
                 if i==4
@@ -35,11 +39,11 @@ switch cub
                 else
                     sep=", ";
                 end
-                fprintf("cpus(%d)=%.3G%s",i,cpus(i),sep);
+                fprintf("cpus(%d)=%.3G"+sep,i,cpus(i));
             end
         end    
     otherwise
         error("cub value %s is not supported\n",cub)
 end
-I=w'*ft;
+I=w'*ao.centers;
 end
