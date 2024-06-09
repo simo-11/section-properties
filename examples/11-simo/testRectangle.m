@@ -30,7 +30,7 @@ domain.polyshape=polyshape(XV,YV);
 domain.domain='rectangle';
 [xlimit,ylimit]=boundingbox(domain.polyshape);
 domain.dbox=[xlimit; ylimit];
-cao.debugLevel=4;
+cao.debugLevel=ao.debugLevel;
 [t,dbox,area_domain]=define_scattered_pointset(ao.card,domain,...
     ao.scat_type); %#ok<ASGLU>
 cao.centers=t;
@@ -84,6 +84,7 @@ for i=1:n
                 disp(gof);
             end
         end
+        cao.w_at_centers=w(cao.centers(:,1),cao.centers(:,2));
         for ci=1:cs
             cub=ao.cubs(ci);
             Iw=do_cub(w,domain,cub,cao);
@@ -112,7 +113,7 @@ for i=1:n
             end
             if (Iw>maxIw)
                 fprintf(['Model %s using %s for file %s rejected,'...
-                ' Iw=%.3g, max=%.3g'],...
+                ' Iw=%.3g, max=%.3g\n'],...
                 model,cub,fn,...
                 Iw,maxIw);
                 continue;

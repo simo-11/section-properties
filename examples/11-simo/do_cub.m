@@ -13,6 +13,7 @@ t=table with columns from section-properties
 ao=argument object struct with fields
  debugLevel int
  centers matrix of size ncenters,2
+ w_at_centers
 %}
 arguments
     f
@@ -45,5 +46,5 @@ switch cub
     otherwise
         error("cub value %s is not supported\n",cub)
 end
-I=w'*ao.centers;
+I=w'*ao.w_at_centers;
 end

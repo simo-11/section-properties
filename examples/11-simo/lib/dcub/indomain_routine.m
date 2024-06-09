@@ -29,7 +29,8 @@ switch domain_str
 
         P=domain_structure.polyshape;
         X=pts(:,1); Y=pts(:,2);
-        in=isinterior(P,X,Y);
+        [TFin,TFon]=isinterior(P,X,Y);
+        in=TFin & not(TFon);
 
     case 'disk'
 
