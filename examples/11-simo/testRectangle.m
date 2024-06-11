@@ -7,7 +7,7 @@ arguments
     ao.debugLevel=0
     ao.plot=0
     ao.scat_type='halton'
-    ao.card=500
+    ao.cards=[500]
     ao.rsquareMin=0.9
     ao.n="*"
 end
@@ -31,8 +31,6 @@ domain.domain='rectangle';
 [xlimit,ylimit]=boundingbox(domain.polyshape);
 domain.dbox=[xlimit; ylimit];
 cao.debugLevel=ao.debugLevel;
-[cao.centers,cao.dbox,cao.area_domain]=...
-    define_scattered_pointset(ao.card,domain,ao.scat_type);
 for i=1:n
     fn=list(i).name;
     fprintf("file=%s\n",fn);
@@ -83,54 +81,65 @@ for i=1:n
                 disp(gof);
             end
         end
-        cao.w_at_centers=w(cao.centers(:,1),cao.centers(:,2));
         for ci=1:cs
             cub=ao.cubs(ci);
-            tic
-            Iw=do_cub(w,domain,cub,cao);
-            elapsed=toc;
-            if anynan(Iw)
-                fprintf("model=%s, cub=%s failed\n",model,cub);
-                continue;
-            end    
-            fprintf("model=%s, cub=%s, Iw=%.3g, elapsed=%.2G s\n", ...
-                model,cub,Iw,elapsed);
-            if ao.plot && ci==1
-                s=sprintf("%s for %s",model,fn);
-                figure('Name',s);
-                switch fitMethod
-                    case 'fit'
-                    plot(f,[t.x t.y],t.w);
-                    s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
-                    title(s);
-                    case 'tpaps'
-                    tps_plot(f,list(i),t);
-                    s=sprintf("Iw=%.3g",Iw);
-                    title(s);
+            cub_with_card="";
+            for card=ao.cards
+                if cub==cub_with_card
+                    continue
                 end
-                axis equal;
-                ax=gca;
-                dz=(max(t.w)-min(t.w))/min([max(t.x) max(t.y)]);
-                ax.DataAspectRatio=[1 1 dz];
-            end
-            if (Iw>maxIw)
-                fprintf(['Model %s using %s for file %s rejected,'...
-                ' Iw=%.3g, max=%.3g\n'],...
-                model,cub,fn,...
-                Iw,maxIw);
-                continue;
-            end
-            es=sprintf("o.%s_%s_Iw=Iw;",model,cub);
-            eval(es);
-            if ci==1
-                es=sprintf("o.%s_fit=f;",model);
+                cao.card=card;
+                [cao.centers,cao.dbox,cao.area_domain]=...
+                   define_scattered_pointset(card,domain,ao.scat_type);            
+                cao.w_at_centers=w(cao.centers(:,1),cao.centers(:,2));
+                tic
+                [Iw,cub_suffix]=do_cub(w,domain,cub,cao);
+                elapsed=toc;
+                cub_with_card=sprintf("%s%s",cub,cub_suffix);
+                if anynan(Iw)
+                    fprintf("model=%s, cub=%s failed\n",...
+                        model,cub_with_card);
+                    continue;
+                end    
+                fprintf("model=%s-%s, Iw=%.3g, do_cub took %.2G s\n", ...
+                    model,cub_with_card,Iw,elapsed);
+                if ao.plot && ci==1
+                    s=sprintf("%s for %s",model,fn);
+                    figure('Name',s);
+                    switch fitMethod
+                        case 'fit'
+                        plot(f,[t.x t.y],t.w);
+                        s=sprintf("Iw=%.3g, rsquare=%.4g",Iw,gof.rsquare);
+                        title(s);
+                        case 'tpaps'
+                        tps_plot(f,list(i),t);
+                        s=sprintf("Iw=%.3g",Iw);
+                        title(s);
+                    end
+                    axis equal;
+                    ax=gca;
+                    dz=(max(t.w)-min(t.w))/min([max(t.x) max(t.y)]);
+                    ax.DataAspectRatio=[1 1 dz];
+                end
+                if (Iw>maxIw)
+                    fprintf(['Model %s using %s for file %s rejected,'...
+                    ' Iw=%.3g, max=%.3g\n'],...
+                    model,cub,fn,...
+                    Iw,maxIw);
+                    continue;
+                end
+                es=sprintf("o.%s_%s_Iw=Iw;",model,cub);
                 eval(es);
-                switch fitMethod
-                    case 'fit'
-                    es=sprintf("o.%s_gof=gof;",model);
+                if ci==1
+                    es=sprintf("o.%s_fit=f;",model);
                     eval(es);
-                    es=sprintf("o.%s_output=output;",model);
-                    eval(es);
+                    switch fitMethod
+                        case 'fit'
+                        es=sprintf("o.%s_gof=gof;",model);
+                        eval(es);
+                        es=sprintf("o.%s_output=output;",model);
+                        eval(es);
+                    end
                 end
             end
         end

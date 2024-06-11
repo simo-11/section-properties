@@ -1,4 +1,4 @@
-function I=do_cub(f,domain,cub,ao)
+function [I,cub_suffix]=do_cub(f,domain,cub,ao)
 %
 %{
 f=function to evaluate
@@ -28,6 +28,9 @@ switch cub
     case 'integral2'
         I=integral2(f,domain.dbox(1,1),domain.dbox(1,2),...
             domain.dbox(2,1),domain.dbox(2,2));
+        if nargout>1
+           cub_suffix="";
+        end
         return
     case 'glaubitz'
         area_dbox=diff(ao.dbox(1,:))*diff(ao.dbox(2,:));
@@ -49,6 +52,9 @@ switch cub
         end    
     otherwise
         error("cub value %s is not supported\n",cub)
+end
+if nargout>1
+   cub_suffix=sprintf("(%G)",ao.card); 
 end
 I=w'*ao.w_at_centers;
 end
