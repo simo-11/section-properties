@@ -101,8 +101,8 @@ for i=1:n
                         model,cub_with_card);
                     continue;
                 end    
-                fprintf("model=%s-%s, Iw=%.3g, do_cub took %.2G s\n", ...
-                    model,cub_with_card,Iw,elapsed);
+                fprintf("model=%s-%s, Iw=%.3g, do_cub took %.3G ms\n", ...
+                    model,cub_with_card,Iw,elapsed*1000);
                 if ao.plot && ci==1
                     s=sprintf("%s for %s",model,fn);
                     figure('Name',s);
