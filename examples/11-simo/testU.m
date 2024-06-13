@@ -5,7 +5,7 @@ arguments
     ao.t=4
     ao.r=0
     ao.r_n=0
-    ao.models=["cubicinterp","poly44","sinhs"]
+    ao.models=["cubicinterp","poly44","tps"]
     ao.debugLevel=0
     ao.plot=0
     ao.rsquareMin=0.9
