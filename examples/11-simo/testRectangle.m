@@ -4,11 +4,11 @@ arguments
     ao.width=100
     ao.models=["poly44","cubicinterp","tps"]
     ao.cubs=["integral2","glaubitz","rbfcub"]
-    ao.debugLevel=0
-    ao.plot=0
     ao.scat_type='halton'
     ao.cards=[500]
     ao.rsquareMin=0.9
+    ao.debugLevel=0
+    ao.plot=0
     ao.n="*"
 end
 %{
@@ -31,6 +31,7 @@ domain.domain='rectangle';
 [xlimit,ylimit]=boundingbox(domain.polyshape);
 domain.dbox=[xlimit; ylimit];
 cao.debugLevel=ao.debugLevel;
+cao.plot=ao.plot;
 for i=1:n
     fn=list(i).name;
     fprintf("file=%s\n",fn);

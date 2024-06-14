@@ -21,8 +21,11 @@ arguments
     cub
     ao
 end
-if ao.debugLevel>3
-    fprintf("cub=%s\n",cub);
+if ao.plot
+    plot(domain.polyshape);
+    hold on;
+    axis equal;
+    plot(ao.centers(:,1),ao.centers(:,2),'o')
 end
 switch cub
     case 'integral2'
@@ -40,16 +43,6 @@ switch cub
     case 'rbfcub'
         [w, cpus, Vcond , moms , res2 ,phi_str]=...
             RBF_cub_polygon_OPT(domain.polyshape,ao.centers);%#ok<ASGLU>
-        if ao.debugLevel>3
-            for i=1:4
-                if i==4
-                    sep="\n";
-                else
-                    sep=", ";
-                end
-                fprintf("cpus(%d)=%.3G"+sep,i,cpus(i));
-            end
-        end    
     otherwise
         error("cub value %s is not supported\n",cub)
 end

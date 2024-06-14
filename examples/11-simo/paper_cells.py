@@ -130,6 +130,7 @@ for p in ("rhs","u"):
         print(f'Wrote {fn}')
         plt.show();
         section.write_warping_csv()
+        section.write_triangles_csv()
         section.write_warping_gltf()
         section.write_warping_ply()
 

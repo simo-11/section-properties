@@ -2,7 +2,7 @@
 ao.models=["poly44","cubicinterp","tps"];
 ao.cubs=["integral2","glaubitz","rbfcub"];
 ao.umodels=["poly44","cubicinterp","tps"];
-ao.ucubs=["integral2","glaubitz","rbfcub"];
+ao.ucubs=["glaubitz","rbfcub"];
 ao.debugLevel=0;
 ao.plot=0;
 ao.scat_type='halton';
@@ -47,7 +47,8 @@ r=testRectangle(height=10,width=100,models=ao.models,...
     cubs=ao.cubs,debug=ao.debugLevel,cards=ao.cards);
 %% sharp cornered U-section 100x50x4
 su=testU(height=100,width=50,t=4,models=ao.umodels,...
-    cubs=ao.ucubs,debug=ao.debugLevel,cards=ao.ucards);
+    cubs=ao.ucubs,debug=ao.debugLevel,cards=ao.ucards ...
+    );
 %% U-section 100x50x4 with rounded corners
 ru=testU(height=100,width=50,t=4,models=ao.umodels,...
     cubs=ao.ucubs,debug=ao.debugLevel,cards=ao.ucards);
