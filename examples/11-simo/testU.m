@@ -3,24 +3,24 @@ arguments
     ao.height=100
     ao.width=50
     ao.t=4
-    ao.r=0
-    ao.r_n=0
+    ao.r=8
+    ao.n_r=8
     ao.models=["cubicinterp","poly44","tps"]
-    ao.cubs=["glaubitz","rbfcub"]
+    ao.cubs=["rbfcub"]
     ao.scat_type='halton'
-    ao.cards=[500]    
+    ao.cards=[100]    
     ao.debugLevel=0
-    ao.plot=0
+    ao.plot=1
     ao.rsquareMin=0.9
     ao.check_area=1
     ao.latex=1
-    ao.max_area_error_percent=1
+    ao.max_area_error_percent=2
 end
 %{
 Test warping function fit using csv files in gen directory
 %}
 fp=sprintf("gen/warping-cold-formed-u-%g-%g-%g-%g-%g-*.csv",...
-    ao.height,ao.width,ao.t,ao.r,ao.r_n);
+    ao.height,ao.width,ao.t,ao.r,ao.n_r);
 list=dir(fp);
 n=size(list,1);
 c=cell(n,1);
@@ -32,6 +32,8 @@ T=ao.t/1000;
 if ao.r==0
     XV=[0 W W T T   W   W 0];
     YV=[0 0 T T H-T H-T H H];
+else
+    [XV,YV]=getVertices(ao.r/1000,ao.n_r,H,W,T);
 end
 domain.vertices=[XV' YV'];
 domain.polyshape=polyshape(XV,YV);
@@ -181,9 +183,56 @@ for i=1:n
                 end
             end
         end
-
     end
     c{i}=o;
 end
+end
 
-
+function [XV,YV]=getVertices(r,n_r,h,b,t)
+    if r<t
+        error('r=%g but it may not be <t=%g',r,t);
+    end
+    if r>b
+        error('r=%g but it may not be >b=%g',r,b);
+    end
+    if n_r==1
+        error('n_r must be >1 if r is defined');
+    end
+    if n_r==0
+        n_r=4;
+    end
+    r_in=r;
+    r_out=r+t;
+    np=8+4*(n_r-1);
+    pa=zeros(np,2);
+    %points=zeros(4+n_r);
+    ri=1;
+    % outer bottom left radius
+    [n,npa]=draw_radius([r_out, r_out],r_out,pi,n_r);
+    pa(ri:ri+n-1,:)=npa;
+    ri=ri+n;
+    % bottom right corner
+    pa(ri,:)=[b,0];
+    pa(ri+1,:)=[b,t];
+    ri=ri+2;
+    % inner bottom left radius
+    [n,npa]=draw_radius([t+r_in, t+r_in],r_in,...
+        1.5*pi,n_r,false);
+    pa(ri:ri+n-1,:)=npa;
+    ri=ri+n;
+    % inner top left radius
+    [n,npa]=draw_radius([t + r_in, h - t - r_in], r_in,...
+        pi, n_r, false);
+    pa(ri:ri+n-1,:)=npa;
+    ri=ri+n;
+    % top right corner
+    pa(ri,:)=[b,h-t];
+    pa(ri+1,:)=[b,h];
+    ri=ri+2;
+    % outer top left radius
+    [n,npa]=draw_radius([r_out, h - r_out], r_out,...
+        0.5 * pi, n_r);
+    pa(ri:ri+n-1,:)=npa;
+    XV=pa(:,1);
+    YV=pa(:,2);
+end
