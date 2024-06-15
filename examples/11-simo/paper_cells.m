@@ -2,12 +2,12 @@
 ao.models=["poly44","cubicinterp","tps"];
 ao.cubs=["integral2","glaubitz","rbfcub"];
 ao.umodels=["poly44","cubicinterp","tps"];
-ao.ucubs=["rbfcub"];
+ao.ucubs=["rbfcub"]; %#ok<NBRAK2>
 ao.debugLevel=0;
 ao.plot=0;
 ao.scat_type='halton';
 ao.cards=[50,100,400,500];
-ao.ucards=[50,100,400,500];
+ao.ucards=[50,100,200,400];
 ao.rsquareMin=0.9;
 ao.n="*";
 %% 

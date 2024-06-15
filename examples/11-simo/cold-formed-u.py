@@ -162,7 +162,6 @@ while simo.dev.run(args):
         iwDiff=abs((iw-iw0)/iw0)
         print(("It = {0:.3g}, Iw = {1:.3g}, k(steel) = {2:.2f}")
               .format(it,iw,math.sqrt(it/(2.6*iw))))
-        print(("It = {0:.3g}, Iw = {1:.3g}").format(it,iw))
         print("Shear center: ({0:.3g},{1:.3g})".format(*section.get_sc()))
         if args.plot_warping_values:
             section.plot_warping_values()

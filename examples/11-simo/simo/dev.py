@@ -172,7 +172,7 @@ class DevSection(Section):
         with open(self.gfn(fn), 'w', newline='') as file:
             data={
                 'area':self.get_area(),
-                'c':self.get_area(),
+                'c':self.get_c(),
                 'gamma':self.get_gamma(),
                 'ic':self.get_ic(),
                 'ig':self.get_ig(),
