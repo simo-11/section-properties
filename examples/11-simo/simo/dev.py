@@ -10,6 +10,7 @@ import pygltflib#noqa
 import numpy as np
 import csv
 import math
+import json
 import matplotlib.pyplot as plt
 from plyfile import PlyData, PlyElement
 
@@ -164,6 +165,25 @@ class DevSection(Section):
 
     def uses_n_r(self):
         return self.args.primitive in (RHS,COLD_FORMED_U)
+
+    def write_json(self,fn=None):
+        if fn==None:
+            fn=self.default_filename(suffix='.json',use_case='results')
+        with open(self.gfn(fn), 'w', newline='') as file:
+            data={
+                'area':self.get_area(),
+                'c':self.get_area(),
+                'gamma':self.get_gamma(),
+                'ic':self.get_ic(),
+                'ig':self.get_ig(),
+                'ip':self.get_ip(),
+                'j':self.get_j(),
+                'q':self.get_j(),
+                'sc':self.get_sc(),
+                'z':self.get_z(),
+            }
+            print(json.dumps(data, indent=2), file=file)
+        print(f"Wrote {fn}")
 
     def write_warping_csv(self,fn=None):
         if fn==None:

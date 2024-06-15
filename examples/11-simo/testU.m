@@ -6,12 +6,14 @@ arguments
     ao.r=0
     ao.r_n=0
     ao.models=["cubicinterp","poly44","tps"]
-    ao.cubs=["integral2","glaubitz","rbfcub"]
+    ao.cubs=["glaubitz","rbfcub"]
     ao.scat_type='halton'
     ao.cards=[500]    
     ao.debugLevel=0
     ao.plot=0
     ao.rsquareMin=0.9
+    ao.check_area=1
+    ao.max_area_error_percent=1
 end
 %{
 Test warping function fit using csv files in gen directory
@@ -44,6 +46,10 @@ for i=1:n
     end
     file=sprintf("%s/%s",list(i).folder,fn);
     t=readtable(file);
+    rfn=replace(fn,"warping","results");
+    rfn=replace(rfn,"csv","json");
+    fn=sprintf("%s/%s",list(i).folder,rfn);
+    cao.spr=jsondecode(fileread(fn));
     if ao.debugLevel>1
         fprintf("x values: %.3g - %.3g\n",min(t.x),max(t.x));
         fprintf("y values: %.3g - %.3g\n",min(t.y),max(t.y));
@@ -71,7 +77,7 @@ for i=1:n
                     gof.rsquare,ao.rsquareMin);
                     continue;
                 end                
-                w=@(x,y)f(x,y).^2;
+                w=@(x,y)f(x,y);
             case 'tpaps'
                 if strlength(model)>3
                     pin=str2double(extractAfter(model,3));
@@ -79,7 +85,7 @@ for i=1:n
                     pin=1;
                 end
                 f=tpaps([t.x t.y]',t.w',pin);
-                w=@(x,y)reshape(fnval(f,[x(:)';y(:)']).^2,...
+                w=@(x,y)reshape(fnval(f,[x(:)';y(:)']),...
                     size(x,1),[]);
         end
         if ao.debugLevel>1
@@ -91,19 +97,38 @@ for i=1:n
         end
         for ci=1:cs
             cub=ao.cubs(ci);
-            cub_with_card="";
             for card=ao.cards
-                if cub==cub_with_card
-                    continue
-                end
+                tic
                 cao.card=card;
                 [cao.centers,cao.dbox,cao.area_domain]=...
                    define_scattered_pointset(card,domain,ao.scat_type);            
-                cao.w_at_centers=w(cao.centers(:,1),cao.centers(:,2));
-                tic
-                [Iw,cub_suffix]=do_cub(w,domain,cub,cao);
+                w_at_centers=w(cao.centers(:,1),cao.centers(:,2));
+                weights=get_weights(domain,cub,cao);
+                A=cao.spr.area;
+                if ao.check_area
+                    % Check domain definition
+                    Ac=sum(weights);
+                    error_percent=100*abs((Ac-A)/A);
+                    if error_percent>ao.max_area_error_percent
+                        fprintf(['Domain definition or weights for %s'...
+                            ' cubature are not correct.\n'...
+                            'Area from section-properties was %.3G'...
+                            ' and got %.3G\nError-%% is %.2G'...
+                            ' which is higher than allowed %.3G\n'],...
+                            cub,A,Ac,error_percent,...
+                            ao.max_area_error_percent);
+                        continue;
+                    end
+                end
+                x_s=cao.spr.sc(1);
+                y_s=cao.spr.sc(2);
+                Io=weights'*w_at_centers.*w_at_centers;
+                Qo=weights'*w_at_centers;
+                Ixo=weights'*cao.centers(:,1).*w_at_centers;
+                Iyo=weights'*cao.centers(:,2).*w_at_centers;
+                Iw=Io-Qo^2/A-y_s*Ixo+x_s*Iyo;      
                 elapsed=toc;
-                cub_with_card=sprintf("%s%s",cub,cub_suffix);
+                cub_with_card=sprintf("%s(%s)",cub,card);
                 if anynan(Iw)
                     fprintf("model=%s, cub=%s failed\n",...
                         model,cub_with_card);

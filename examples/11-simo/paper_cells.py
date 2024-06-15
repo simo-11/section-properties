@@ -40,6 +40,7 @@ for h in (100,80,60,30,10,2):
         plt.savefig(fn,bbox_inches='tight')
         print(f'Wrote {fn}')
         plt.show();
+        section.write_json()
         section.write_warping_csv()
         section.write_triangles_csv()
         section.write_warping_gltf()
@@ -91,7 +92,7 @@ for p in ("rhs","u"):
             n_r=0
         else:
             n_r=8
-        match p:
+        match p:#noqa
             case "rhs":
                 script="primitive"
                 primitive=f"--primitive {p}"
@@ -129,6 +130,7 @@ for p in ("rhs","u"):
         plt.savefig(fn,bbox_inches='tight')
         print(f'Wrote {fn}')
         plt.show();
+        section.write_json()
         section.write_warping_csv()
         section.write_triangles_csv()
         section.write_warping_gltf()

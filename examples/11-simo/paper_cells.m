@@ -2,7 +2,7 @@
 ao.models=["poly44","cubicinterp","tps"];
 ao.cubs=["integral2","glaubitz","rbfcub"];
 ao.umodels=["poly44","cubicinterp","tps"];
-ao.ucubs=["glaubitz","rbfcub"];
+ao.ucubs=["rbfcub"];
 ao.debugLevel=0;
 ao.plot=0;
 ao.scat_type='halton';
