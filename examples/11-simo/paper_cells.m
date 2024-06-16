@@ -1,13 +1,16 @@
 %% settings
 ao.models=["poly44","cubicinterp","tps"];
 ao.cubs=["integral2","glaubitz","rbfcub"];
-ao.umodels=["poly44","cubicinterp","tps"];
-ao.ucubs=["rbfcub"]; %#ok<NBRAK2>
+ao.u_models=["poly44","cubicinterp","tps"];
+ao.u_cubs=["rbfcub"]; %#ok<NBRAK2>
+ao.rhs_models=["poly44","cubicinterp","tps"];
+ao.rhs_cubs=["rbfcub"]; %#ok<NBRAK2>
 ao.debugLevel=0;
 ao.plot=0;
 ao.scat_type='halton';
 ao.cards=[50,100,400,500];
-ao.ucards=[50,100,200,400];
+ao.u_cards=[50,100,200,400];
+ao.rhs_cards=[50,100,200,400];
 ao.rsquareMin=0.9;
 ao.n="*";
 add_lib_to_path
@@ -45,9 +48,16 @@ ss=testRectangle(height=100,width=100,models=ao.models,...
 r=testRectangle(height=10,width=100,models=ao.models,...
     cubs=ao.cubs,debug=ao.debugLevel,cards=ao.cards);
 %% sharp cornered U-section 100x50x4
-su=testU(height=100,width=50,t=4,models=ao.umodels,...
-    cubs=ao.ucubs,debug=ao.debugLevel,cards=ao.ucards ...
+su=testU(height=100,width=50,t=4,models=ao.u_models,...
+    cubs=ao.u_cubs,debug=ao.debugLevel,cards=ao.u_cards ...
     );
 %% U-section 100x50x4 with rounded corners
-ru=testU(height=100,width=50,t=4,n_r=8,models=ao.umodels,...
-    cubs=ao.ucubs,debug=ao.debugLevel,cards=ao.ucards);
+ru=testU(height=100,width=50,t=4,n_r=8,models=ao.u_models,...
+    cubs=ao.u_cubs,debug=ao.debugLevel,cards=ao.u_cards);
+%% sharp cornered SHS 150x150x8
+sr=testRHS(height=150,width=150,t=8,models=ao.rhs_models,...
+    cubs=ao.rhs_cubs,debug=ao.debugLevel,cards=ao.rhs_cards ...
+    );
+%% SHS 150x150x8 with rounded corners
+rr=testRHS(height=150,width=150,t=8,n_r=8,models=ao.rhs_models,...
+    cubs=ao.rhs_cubs,debug=ao.debugLevel,cards=ao.rhs_cards);
