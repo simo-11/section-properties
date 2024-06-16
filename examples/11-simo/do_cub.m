@@ -26,6 +26,7 @@ if ao.plot
     hold on;
     axis equal;
     plot(ao.centers(:,1),ao.centers(:,2),'o')
+    hold off
 end
 switch cub
     case 'integral2'

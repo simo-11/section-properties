@@ -10,7 +10,6 @@ ao.cards=[50,100,400,500];
 ao.ucards=[50,100,200,400];
 ao.rsquareMin=0.9;
 ao.n="*";
-%% 
 add_lib_to_path
 %% analytical square solid rectangle 100x100
 w=100;

@@ -5,12 +5,16 @@ arguments
     ao.t=4
     ao.r=8
     ao.n_r=8
-    ao.models=["cubicinterp","poly44","tps"]
+    ao.models=["poly44","cubicinterp","tps"]
     ao.cubs=["rbfcub"]
     ao.scat_type='halton'
-    ao.cards=[100]    
+    ao.cards=[10,20,25,30]    
     ao.debugLevel=0
-    ao.plot=1
+    ao.plot=0 
+    % bitwise and
+    % 1:domain 
+    % 2:integration points 
+    % 4:fitted surface
     ao.rsquareMin=0.9
     ao.check_area=1
     ao.latex=1
@@ -41,7 +45,20 @@ domain.domain='rectangle';
 [xlimit,ylimit]=boundingbox(domain.polyshape);
 domain.dbox=[xlimit; ylimit];
 cao.debugLevel=ao.debugLevel;
-cao.plot=ao.plot;
+cao.plot=bitand(ao.plot,2);
+if bitand(ao.plot,1)
+    fig=gcf;
+    if isempty(fig.Name)
+        fig.Name=fp;
+    else
+        pos=fig.Position;
+        fig=figure;
+        fig.Name=fp;
+        fig.Position(1)=pos(1)+pos(3);
+    end
+    plot(domain.polyshape);
+    axis equal;
+end
 for i=1:n
     fn=list(i).name;
     fprintf("file=%s\n",fn);
@@ -143,7 +160,7 @@ for i=1:n
                     fprintf("model=%s-%s, Iw=%.3g, cub took %.3G ms\n", ...
                         model,cub_with_card,Iw,elapsed*1000);
                 end
-                if ao.plot && ci==1
+                if bitand(ao.plot,4) && ci==1
                     s=sprintf("%s for %s",model,fn);
                     figure('Name',s);
                     switch fitMethod
