@@ -4,7 +4,7 @@ arguments
     ao.width=50
     ao.t=4
     ao.r=8
-    ao.n_r=8
+    ao.n_r=0
     ao.models=["poly44","cubicinterp","tps"]
     ao.cubs=["rbfcub"]
     ao.scat_type='halton'

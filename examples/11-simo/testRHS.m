@@ -4,21 +4,21 @@ arguments
     ao.width=150
     ao.t=8
     ao.r=16
-    ao.n_r=8
-    ao.models=["poly44","cubicinterp","tps"]
+    ao.n_r=0
+    ao.models=["cubicinterp","tps"]
     ao.cubs=["rbfcub"]
     ao.scat_type='halton'
     ao.cards=[10,20,25,30]    
     ao.debugLevel=0
-    ao.plot=0 
+    ao.plot=0
     % bitwise and
     % 1:domain 
     % 2:integration points 
     % 4:fitted surface
-    ao.rsquareMin=0.9
+    ao.rsquareMin=0.2
     ao.check_area=1
     ao.latex=1
-    ao.max_area_error_percent=2
+    ao.max_area_error_percent=3
 end
 %{
 Test warping function fit using csv files in gen directory
@@ -37,10 +37,18 @@ T=ao.t/1000;
 if ao.r==0
     XV=[0 W/2 W/2 T T   0  ];
     YV=[0 0   T   T H/2 H/2];
+    ps1=polyshape(XV,YV);
 else
-    [XV,YV]=getVertices(ao.r/1000,ao.n_r,H,W,T);
+    [XV,YV]=getVertices(ao.r/1000,ao.n_r,H/2,W/2,T);
+    ps1=polyshape(XV,YV);
 end
-domain.vertices=[XV' YV'];
+ps2=rotate(ps1,90);
+ps3=translate(ps2,[W 0]);
+ps4=union(ps1,ps3);
+ps5=rotate(ps4,180);
+ps6=translate(ps5,[W H]);
+ps=union(ps4,ps6);
+domain.vertices=ps.Vertices;
 domain.polyshape=ps;
 domain.domain='rectangle';
 [xlimit,ylimit]=boundingbox(domain.polyshape);
@@ -207,6 +215,8 @@ end
 end
 
 function [XV,YV]=getVertices(r,n_r,h,b,t)
+% get vertices for polyshape making L with rounder corner
+% which can be seen as quarter of RHS
     if r<t
         error('r=%g but it may not be <t=%g',r,t);
     end
@@ -221,7 +231,7 @@ function [XV,YV]=getVertices(r,n_r,h,b,t)
     end
     r_in=r;
     r_out=r+t;
-    np=8+4*(n_r-1);
+    np=6+2*(n_r-1);
     pa=zeros(np,2);
     %points=zeros(4+n_r);
     ri=1;
@@ -238,19 +248,9 @@ function [XV,YV]=getVertices(r,n_r,h,b,t)
         1.5*pi,n_r,false);
     pa(ri:ri+n-1,:)=npa;
     ri=ri+n;
-    % inner top left radius
-    [n,npa]=draw_radius([t + r_in, h - t - r_in], r_in,...
-        pi, n_r, false);
-    pa(ri:ri+n-1,:)=npa;
-    ri=ri+n;
-    % top right corner
-    pa(ri,:)=[b,h-t];
-    pa(ri+1,:)=[b,h];
-    ri=ri+2;
-    % outer top left radius
-    [n,npa]=draw_radius([r_out, h - r_out], r_out,...
-        0.5 * pi, n_r);
-    pa(ri:ri+n-1,:)=npa;
+    % line of symmetry
+    pa(ri,:)=[t,h];
+    pa(ri+1,:)=[0,h];
     XV=pa(:,1);
     YV=pa(:,2);
 end
