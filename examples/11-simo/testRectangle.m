@@ -9,6 +9,7 @@ arguments
     ao.rsquareMin=0.9
     ao.debugLevel=0
     ao.plot=0
+    ao.latex=1
     ao.n="*"
 end
 %{
@@ -101,9 +102,15 @@ for i=1:n
                     fprintf("model=%s, cub=%s failed\n",...
                         model,cub_with_card);
                     continue;
-                end    
-                fprintf("model=%s-%s, Iw=%.3g, do_cub took %.3G ms\n", ...
+                end
+                if ao.latex
+                    fprintf("%s%s-%s & %.3g %s\n", ...
+                    "\hspace{1cm}",model,cub_with_card,...
+                    Iw*1e12,"\(10^{-12}\)\\");
+                else
+                    fprintf("model=%s-%s, Iw=%.3g, cub took %.3G ms\n", ...
                     model,cub_with_card,Iw,elapsed*1000);
+                end
                 if ao.plot && ci==1
                     s=sprintf("%s for %s",model,fn);
                     figure('Name',s);
