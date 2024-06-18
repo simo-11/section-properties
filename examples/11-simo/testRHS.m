@@ -3,14 +3,14 @@ arguments
     ao.height=150
     ao.width=150
     ao.t=8
-    ao.r=16
+    ao.r=16 % outer radius
     ao.n_r=0
     ao.models=["cubicinterp","tps"]
     ao.cubs=["rbfcub"]
     ao.scat_type='halton'
     ao.cards=[10,20,25,30]    
     ao.debugLevel=0
-    ao.plot=0
+    ao.plot=7
     % bitwise and
     % 1:domain 
     % 2:integration points 
@@ -18,7 +18,7 @@ arguments
     ao.rsquareMin=0.2
     ao.check_area=1
     ao.latex=1
-    ao.max_area_error_percent=3
+    ao.max_area_error_percent=0.1
 end
 %{
 Test warping function fit using csv files in gen directory
@@ -39,7 +39,7 @@ if ao.r==0
     YV=[0 0   T   T H/2 H/2];
     ps1=polyshape(XV,YV);
 else
-    [XV,YV]=getVertices(ao.r/1000,ao.n_r,H/2,W/2,T);
+    [XV,YV]=getVertices(ao.r/1000-T,ao.n_r,H/2,W/2,T);
     ps1=polyshape(XV,YV);
 end
 ps2=rotate(ps1,90);
@@ -216,6 +216,7 @@ end
 
 function [XV,YV]=getVertices(r,n_r,h,b,t)
 % get vertices for polyshape making L with rounder corner
+% r=inner radius
 % which can be seen as quarter of RHS
     if r<t
         error('r=%g but it may not be <t=%g',r,t);

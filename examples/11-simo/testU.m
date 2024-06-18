@@ -3,7 +3,7 @@ arguments
     ao.height=100
     ao.width=50
     ao.t=4
-    ao.r=8
+    ao.r=8 % outer radius
     ao.n_r=0
     ao.models=["poly44","cubicinterp","tps"]
     ao.cubs=["rbfcub"]
@@ -18,7 +18,7 @@ arguments
     ao.rsquareMin=0.9
     ao.check_area=1
     ao.latex=1
-    ao.max_area_error_percent=2
+    ao.max_area_error_percent=0.1
 end
 %{
 Test warping function fit using csv files in gen directory
@@ -37,7 +37,7 @@ if ao.r==0
     XV=[0 W W T T   W   W 0];
     YV=[0 0 T T H-T H-T H H];
 else
-    [XV,YV]=getVertices(ao.r/1000,ao.n_r,H,W,T);
+    [XV,YV]=getVertices(ao.r/1000-T,ao.n_r,H,W,T);
 end
 domain.vertices=[XV' YV'];
 domain.polyshape=polyshape(XV,YV);
