@@ -86,7 +86,7 @@ print(f'Wrote {fn}')
 plt.show()        
 # %% U and SHS
 import matplotlib.pyplot as plt
-for p in ("rhs","u"):
+for p in ("rhs",):
     for r in ("s","r"):
         if r=="s":
             n_r=0
@@ -99,7 +99,7 @@ for p in ("rhs","u"):
                 h=150
                 w=h
                 t=8
-                ms=1e-5
+                ms=1e-4
             case "u":
                 script="cold-formed-u"
                 primitive=""
