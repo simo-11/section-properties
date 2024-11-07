@@ -1,6 +1,6 @@
 [project]
 name = "sectionproperties"
-version = "3.5.0"
+version = "3.6.0"
 description = "A python package for the analysis of arbitrary cross-sections using the finite element method."
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -74,14 +74,14 @@ docs = [
 ]
 test = [
     "pytest==8.3.3",
-    "pytest-benchmark[histogram]==4.0.0",
+    "pytest-benchmark[histogram]==5.1.0",
     "pytest-check==2.4.1",
     "coverage[toml]==7.6.4",
 ]
 lint = [
     "pre-commit==4.0.1",
     "ruff==0.7.1",
-    "pyright==1.1.386",
+    "pyright==1.1.387",
 ]
 
 [tool.uv]
