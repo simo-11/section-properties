@@ -53,10 +53,7 @@ version-resolver:
 # Custom text at start of release
 header: >
 
-  This release introduces the calculation of the yield moment when material properties
-  are applied to the section. The yield moment is calculated as part of the geometric
-  analysis with `calculate_geometric_properties()` and can be retrieved with the
-  `get_my()` or `get_my_p()` methods.
+  This release loosens strict dependency versions.
 
 template: |
 
